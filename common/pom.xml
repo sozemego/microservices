@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.soze</groupId>
-    <artifactId>users</artifactId>
+    <artifactId>common</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <parent>
@@ -47,16 +47,7 @@
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.soze</groupId>
-            <artifactId>common</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
-    <build>
-        <finalName>users</finalName>
-    </build>
     
 </project>

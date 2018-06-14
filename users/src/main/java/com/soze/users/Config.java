@@ -1,8 +1,11 @@
 package com.soze.users;
 
+import com.soze.service.EventStoreService;
 import org.springframework.amqp.core.*;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class Config {
@@ -25,5 +28,14 @@ public class Config {
     return BindingBuilder.bind(queue).to(fanoutExchange);
   }
 
+  @Bean
+  public RestTemplate restTemplate(final RestTemplateBuilder builder) {
+    return builder.build();
+  }
+
+  @Bean
+  EventStoreService eventStoreService(final RestTemplate restTemplate) {
+    return new EventStoreService(restTemplate);
+  }
 
 }

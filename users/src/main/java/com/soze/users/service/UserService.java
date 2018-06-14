@@ -24,7 +24,7 @@ public class UserService {
     this.rabbitTemplate = rabbitTemplate;
   }
 
-  public void createUser(CreateUserCommand command) {
+  public void createUser(final CreateUserCommand command) {
     User user = new User();
     UserCreatedEvent userCreatedEvent = user.processUserCreatedCommand(command);
     rabbitTemplate.convertAndSend(Config.EXCHANGE, "", userCreatedEvent);

@@ -35,7 +35,7 @@ public class User {
     }
 
     public UserCreatedEvent processUserCreatedCommand(CreateUserCommand command) {
-        return new UserCreatedEvent(command.getUserId(), OffsetDateTime.now(), command.getName(), getVersion() + 1);
+        return new UserCreatedEvent(command.getUserId(), OffsetDateTime.now(), getVersion() + 1, command.getName());
     }
 
     public void apply(UserCreatedEvent userCreatedEvent) {
