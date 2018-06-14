@@ -10,6 +10,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -26,6 +28,10 @@ public class UserService {
     User user = new User();
     UserCreatedEvent userCreatedEvent = user.processUserCreatedCommand(command);
     rabbitTemplate.convertAndSend(Config.EXCHANGE, "", userCreatedEvent);
+  }
+
+  public List<User> getAllUsers() {
+    return userRepository.getAllUsers();
   }
 
   @RabbitListener(queues = Config.QUEUE)
