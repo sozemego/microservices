@@ -8,6 +8,7 @@ import com.soze.users.Config;
 import com.soze.users.aggregate.User;
 import com.soze.users.commands.CreateUserCommand;
 import com.soze.users.repository.UserRepository;
+import com.soze.utils.ReflectionUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,9 +27,11 @@ public class UserService {
 
   @PostConstruct
   public void setup() {
-    final List<BaseEvent> events = eventStoreService.getEvents(Arrays.asList(EventType.USER_CREATED_EVENT));
-
-    System.out.println(events);
+    eventStoreService
+      .getEvents(Arrays.asList(EventType.USER_CREATED_EVENT))
+      .stream()
+      .peek(event -> System.out.println(event))
+      .forEach(event -> ReflectionUtils.applyEvent(userRepository, event));
   }
 
   @Autowired
