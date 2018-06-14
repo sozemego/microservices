@@ -14,6 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public class EventStoreService {
 
@@ -40,10 +41,7 @@ public class EventStoreService {
 
   public List<BaseEvent> getAllEvents() {
     System.out.println("Making request to " + GET_ALL_EVENTS);
-    final ResponseEntity<String> response = restTemplate.getForEntity(
-      GET_ALL_EVENTS,
-      String.class
-    );
+    final ResponseEntity<String> response = get(GET_ALL_EVENTS, String.class, 5);
 
     return parseJson(response.getBody());
   }
@@ -79,6 +77,25 @@ public class EventStoreService {
       e.printStackTrace();
     }
     return new ArrayList<>();
+  }
+
+  private <T> ResponseEntity<T> get(String url, Class<T> type, int retries) {
+    final Supplier<ResponseEntity<T>> request = () -> restTemplate.getForEntity(url, type);
+    int tries = retries;
+    while(--tries > 0) {
+      try {
+        System.out.println("Making request to " + url);
+        return request.get();
+      } catch (Exception e) {
+        e.printStackTrace();
+        try {
+          Thread.sleep(2000);
+        } catch (InterruptedException ex) {
+          ex.printStackTrace();
+        }
+      }
+    }
+    throw new IllegalStateException("Could not get " + url + " in " + retries + " retries");
   }
 
 }
