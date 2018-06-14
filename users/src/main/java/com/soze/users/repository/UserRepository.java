@@ -4,6 +4,7 @@ import com.soze.events.BaseEvent;
 import com.soze.events.users.UserCreationApprovedEvent;
 import com.soze.events.users.UserCreationDeclinedEvent;
 import com.soze.events.users.UserCreationStartedEvent;
+import com.soze.service.EventPublisherService;
 import com.soze.service.EventStoreService;
 import com.soze.users.Config;
 import com.soze.users.aggregate.User;
@@ -24,28 +25,38 @@ public class UserRepository {
 
   private final EventStoreService eventStoreService;
   private final Map<UUID, String> userIdNameMap = new ConcurrentHashMap<>();
+  private final EventPublisherService eventPublisherService;
 
   @Autowired
-  public UserRepository(EventStoreService eventStoreService) {
+  public UserRepository(EventStoreService eventStoreService,
+                        EventPublisherService eventPublisherService) {
     this.eventStoreService = eventStoreService;
+    this.eventPublisherService = eventPublisherService;
   }
 
   @RabbitListener(queues = Config.QUEUE)
-  public BaseEvent handle(UserCreationStartedEvent userCreationStartedEvent) {
-    if(nameExists(userCreationStartedEvent.getName())) {
-      return new UserCreationDeclinedEvent(
-        userCreationStartedEvent.getAggregateId(),
-        OffsetDateTime.now(),
-        userCreationStartedEvent.getVersion() + 1,
-        "Name already exists"
-      );
+  public void handle(UserCreationStartedEvent userCreationStartedEvent) {
+    if (nameExists(userCreationStartedEvent.getName())) {
+      eventPublisherService.sendEvent(
+        Config.QUEUE,
+        "",
+        new UserCreationDeclinedEvent(
+          userCreationStartedEvent.getAggregateId(),
+          OffsetDateTime.now(),
+          userCreationStartedEvent.getVersion() + 1,
+          "Name already exists"
+        ));
+    } else {
+      userIdNameMap.put(userCreationStartedEvent.getAggregateId(), userCreationStartedEvent.getName());
+      eventPublisherService.sendEvent(
+        Config.QUEUE,
+        "",
+        new UserCreationApprovedEvent(
+          userCreationStartedEvent.getAggregateId(),
+          OffsetDateTime.now(),
+          userCreationStartedEvent.getVersion() + 1
+        ));
     }
-    userIdNameMap.put(userCreationStartedEvent.getAggregateId(), userCreationStartedEvent.getName());
-    return new UserCreationApprovedEvent(
-      userCreationStartedEvent.getAggregateId(),
-      OffsetDateTime.now(),
-      userCreationStartedEvent.getVersion() + 1
-    );
   }
 
   public List<User> getAllUsers() {
