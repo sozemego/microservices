@@ -29,7 +29,7 @@ public class UserRepository {
   }
 
   @RabbitListener(queues = Config.QUEUE)
-  public void handleUserCreatedEvent(final UserCreatedEvent userCreatedEvent) {
+  public void handle(final UserCreatedEvent userCreatedEvent) {
     userIdNameMap.put(userCreatedEvent.getAggregateId(), userCreatedEvent.getName());
   }
 

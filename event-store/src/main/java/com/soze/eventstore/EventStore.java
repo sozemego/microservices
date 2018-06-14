@@ -6,9 +6,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
+
+import static com.soze.events.BaseEvent.*;
 
 @Service
 public class EventStore {
@@ -25,6 +28,13 @@ public class EventStore {
     return events
              .stream()
              .filter(baseEvent -> baseEvent.getAggregateId().equals(aggregateId))
+             .collect(Collectors.toList());
+  }
+
+  public List<BaseEvent> getAggregateEvents(final Set<EventType> eventTypes) {
+    return events
+             .stream()
+             .filter(event -> eventTypes.contains(event.getType()))
              .collect(Collectors.toList());
   }
 

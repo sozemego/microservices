@@ -53,7 +53,7 @@ public abstract class BaseEvent implements Serializable {
   public abstract EventType getType();
 
   public enum EventType {
-    USER_CREATED_EVENT
+    USER_CREATED_EVENT, USER_DELETED_EVENT
   }
 
 }
