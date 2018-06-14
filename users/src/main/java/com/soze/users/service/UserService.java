@@ -34,11 +34,4 @@ public class UserService {
     return userRepository.getAllUsers();
   }
 
-  @RabbitListener(queues = Config.QUEUE)
-  public void process(UserCreatedEvent userCreatedEvent) {
-    User user = new User();
-    user.apply(userCreatedEvent);
-    userRepository.updateUser(user);
-  }
-
 }

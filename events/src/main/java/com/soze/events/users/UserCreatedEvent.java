@@ -9,13 +9,15 @@ public class UserCreatedEvent extends BaseEvent {
 
   private final String name;
 
-  public UserCreatedEvent(final UUID eventId, final UUID aggregateId, final OffsetDateTime createdAt, final String name) {
-    super(eventId, aggregateId, createdAt);
+  public UserCreatedEvent(final UUID eventId,
+                          final UUID aggregateId,
+                          final OffsetDateTime createdAt, final String name, final long version) {
+    super(eventId, aggregateId, createdAt, version);
     this.name = name;
   }
 
-  public UserCreatedEvent(final UUID aggregateId, final OffsetDateTime createdAt, final String name) {
-    this(UUID.randomUUID(), aggregateId, createdAt, name);
+  public UserCreatedEvent(final UUID aggregateId, final OffsetDateTime createdAt, final String name, final long version) {
+    this(UUID.randomUUID(), aggregateId, createdAt, name, version);
   }
 
   public String getName() {

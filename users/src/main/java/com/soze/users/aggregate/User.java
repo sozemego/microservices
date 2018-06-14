@@ -8,31 +8,41 @@ import java.util.UUID;
 
 public class User {
 
-  private UUID aggregateId;
+    private UUID aggregateId;
 
-  private String name;
+    private String name;
 
-  public User() {
+    private long version;
 
-  }
+    public User() {
 
-  public UUID getAggregateId() {
-    return aggregateId;
-  }
+    }
 
-  public String getName() {
-    return name;
-  }
+    public UUID getAggregateId() {
+        return aggregateId;
+    }
 
-  public UserCreatedEvent processUserCreatedCommand(CreateUserCommand command) {
-    return new UserCreatedEvent(command.getUserId(), OffsetDateTime.now(), command.getName());
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void apply(UserCreatedEvent userCreatedEvent) {
-    this.aggregateId = userCreatedEvent.getAggregateId();
-    this.name = userCreatedEvent.getName();
-  }
+    public long getVersion() {
+        return version;
+    }
 
+    public void setVersion(long version) {
+        this.version = version;
+    }
+
+    public UserCreatedEvent processUserCreatedCommand(CreateUserCommand command) {
+        return new UserCreatedEvent(command.getUserId(), OffsetDateTime.now(), command.getName(), getVersion() + 1);
+    }
+
+    public void apply(UserCreatedEvent userCreatedEvent) {
+        this.aggregateId = userCreatedEvent.getAggregateId();
+        this.name = userCreatedEvent.getName();
+        setVersion(userCreatedEvent.getVersion());
+    }
 
 
 }
