@@ -1,7 +1,9 @@
 package com.soze.users;
 
+import com.soze.service.EventPublisherService;
 import com.soze.service.EventStoreService;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,6 +38,11 @@ public class Config {
   @Bean
   EventStoreService eventStoreService(RestTemplate restTemplate) {
     return new EventStoreService(restTemplate);
+  }
+
+  @Bean
+  EventPublisherService eventPublisherService(RabbitTemplate rabbitTemplate) {
+    return new EventPublisherService(rabbitTemplate);
   }
 
 }

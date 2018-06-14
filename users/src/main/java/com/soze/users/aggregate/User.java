@@ -1,9 +1,12 @@
 package com.soze.users.aggregate;
 
+import com.soze.events.BaseEvent;
 import com.soze.events.users.UserCreatedEvent;
 import com.soze.users.commands.CreateUserCommand;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class User {
@@ -34,8 +37,10 @@ public class User {
         this.version = version;
     }
 
-    public UserCreatedEvent processUserCreatedCommand(CreateUserCommand command) {
-        return new UserCreatedEvent(command.getUserId(), OffsetDateTime.now(), getVersion() + 1, command.getName());
+    public List<BaseEvent> process(CreateUserCommand command) {
+        return Arrays.asList(
+          new UserCreatedEvent(command.getUserId(), OffsetDateTime.now(), getVersion() + 1, command.getName())
+        );
     }
 
     public void apply(UserCreatedEvent userCreatedEvent) {

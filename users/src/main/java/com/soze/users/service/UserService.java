@@ -2,14 +2,13 @@ package com.soze.users.service;
 
 import com.soze.events.BaseEvent;
 import com.soze.events.BaseEvent.EventType;
-import com.soze.events.users.UserCreatedEvent;
+import com.soze.service.EventPublisherService;
 import com.soze.service.EventStoreService;
 import com.soze.users.Config;
 import com.soze.users.aggregate.User;
 import com.soze.users.commands.CreateUserCommand;
 import com.soze.users.repository.UserRepository;
 import com.soze.utils.ReflectionUtils;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +21,8 @@ import java.util.List;
 public class UserService {
 
   private final UserRepository userRepository;
-  private final RabbitTemplate rabbitTemplate;
   private final EventStoreService eventStoreService;
+  private final EventPublisherService eventPublisherService;
 
   @PostConstruct
   public void setup() {
@@ -36,17 +35,17 @@ public class UserService {
 
   @Autowired
   public UserService(UserRepository userRepository,
-                     RabbitTemplate rabbitTemplate,
-                     EventStoreService eventStoreService) {
+                     EventStoreService eventStoreService,
+                     EventPublisherService eventPublisherService) {
     this.userRepository = userRepository;
-    this.rabbitTemplate = rabbitTemplate;
     this.eventStoreService = eventStoreService;
+    this.eventPublisherService = eventPublisherService;
   }
 
   public void createUser(CreateUserCommand command) {
     User user = new User();
-    UserCreatedEvent userCreatedEvent = user.processUserCreatedCommand(command);
-    rabbitTemplate.convertAndSend(Config.EXCHANGE, "", userCreatedEvent);
+    List<BaseEvent> events = user.process(command);
+    eventPublisherService.sendEvents(Config.EXCHANGE, "", events);
   }
 
   public List<User> getAllUsers() {
