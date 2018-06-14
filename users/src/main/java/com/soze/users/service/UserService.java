@@ -27,7 +27,7 @@ public class UserService {
   @PostConstruct
   public void setup() {
     eventStoreService
-      .getEvents(Arrays.asList(EventType.USER_CREATED_EVENT))
+      .getEvents(Arrays.asList(EventType.USER_CREATION_STARTED))
       .stream()
       .peek(event -> System.out.println(event))
       .forEach(event -> ReflectionUtils.applyEvent(userRepository, event));

@@ -1,15 +1,18 @@
 package com.soze.users.repository;
 
 import com.soze.events.BaseEvent;
-import com.soze.events.users.UserCreatedEvent;
+import com.soze.events.users.UserCreationApprovedEvent;
+import com.soze.events.users.UserCreationDeclinedEvent;
+import com.soze.events.users.UserCreationStartedEvent;
 import com.soze.service.EventStoreService;
 import com.soze.users.Config;
 import com.soze.users.aggregate.User;
+import com.soze.utils.ReflectionUtils;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -20,7 +23,6 @@ import java.util.stream.Collectors;
 public class UserRepository {
 
   private final EventStoreService eventStoreService;
-
   private final Map<UUID, String> userIdNameMap = new ConcurrentHashMap<>();
 
   @Autowired
@@ -29,22 +31,39 @@ public class UserRepository {
   }
 
   @RabbitListener(queues = Config.QUEUE)
-  public void handle(UserCreatedEvent userCreatedEvent) {
-    userIdNameMap.put(userCreatedEvent.getAggregateId(), userCreatedEvent.getName());
+  public BaseEvent handle(UserCreationStartedEvent userCreationStartedEvent) {
+    if(nameExists(userCreationStartedEvent.getName())) {
+      return new UserCreationDeclinedEvent(
+        userCreationStartedEvent.getAggregateId(),
+        OffsetDateTime.now(),
+        userCreationStartedEvent.getVersion() + 1,
+        "Name already exists"
+      );
+    }
+    userIdNameMap.put(userCreationStartedEvent.getAggregateId(), userCreationStartedEvent.getName());
+    return new UserCreationApprovedEvent(
+      userCreationStartedEvent.getAggregateId(),
+      OffsetDateTime.now(),
+      userCreationStartedEvent.getVersion() + 1
+    );
   }
 
   public List<User> getAllUsers() {
     return userIdNameMap
              .keySet()
              .stream()
-             .map(aggregateId -> eventStoreService.getAggregateEvents(aggregateId))
+             .map(eventStoreService::getAggregateEvents)
              .map(events -> {
                final User user = new User();
                for (BaseEvent event : events) {
-                 user.apply((UserCreatedEvent) event);
+                 ReflectionUtils.applyEvent(user, event);
                }
                return user;
              }).collect(Collectors.toList());
+  }
+
+  public boolean nameExists(String name) {
+    return userIdNameMap.containsValue(name);
   }
 
 }

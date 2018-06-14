@@ -3,7 +3,9 @@ package com.soze.events;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.soze.events.users.UserCreatedEvent;
+import com.soze.events.users.UserCreationApprovedEvent;
+import com.soze.events.users.UserCreationDeclinedEvent;
+import com.soze.events.users.UserCreationStartedEvent;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
@@ -17,7 +19,9 @@ import java.util.UUID;
   visible = true
 )
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = UserCreatedEvent.class, name = "USER_CREATED_EVENT"),
+  @JsonSubTypes.Type(value = UserCreationStartedEvent.class, name = "USER_CREATION_STARTED"),
+  @JsonSubTypes.Type(value = UserCreationApprovedEvent.class, name = "USER_CREATION_APPROVED"),
+  @JsonSubTypes.Type(value = UserCreationDeclinedEvent.class, name = "USER_CREATION_DECLINED"),
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class BaseEvent implements Serializable {
@@ -53,7 +57,7 @@ public abstract class BaseEvent implements Serializable {
   public abstract EventType getType();
 
   public enum EventType {
-    USER_CREATED_EVENT, USER_DELETED_EVENT
+    USER_CREATION_STARTED, USER_CREATION_APPROVED, USER_CREATION_DECLINED
   }
 
 }
