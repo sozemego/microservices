@@ -20,7 +20,7 @@ public class UserRest {
   private final UserService userService;
 
   @Autowired
-  public UserRest(final UserService userService) {
+  public UserRest(UserService userService) {
     this.userService = userService;
   }
 
@@ -31,7 +31,7 @@ public class UserRest {
   }
 
   @PostMapping("/{name}")
-  public ResponseEntity createUser(@PathVariable("name") final String name) {
+  public ResponseEntity createUser(@PathVariable("name") String name) {
     userService.createUser(new CreateUserCommand(UUID.randomUUID(), name));
     return ResponseEntity.ok().build();
   }

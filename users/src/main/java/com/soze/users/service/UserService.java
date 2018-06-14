@@ -35,15 +35,15 @@ public class UserService {
   }
 
   @Autowired
-  public UserService(final UserRepository userRepository,
-                     final RabbitTemplate rabbitTemplate,
-                     final EventStoreService eventStoreService) {
+  public UserService(UserRepository userRepository,
+                     RabbitTemplate rabbitTemplate,
+                     EventStoreService eventStoreService) {
     this.userRepository = userRepository;
     this.rabbitTemplate = rabbitTemplate;
     this.eventStoreService = eventStoreService;
   }
 
-  public void createUser(final CreateUserCommand command) {
+  public void createUser(CreateUserCommand command) {
     User user = new User();
     UserCreatedEvent userCreatedEvent = user.processUserCreatedCommand(command);
     rabbitTemplate.convertAndSend(Config.EXCHANGE, "", userCreatedEvent);

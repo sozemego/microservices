@@ -27,7 +27,7 @@ public abstract class BaseEvent implements Serializable {
   private final OffsetDateTime createdAt;
   private final long version;
 
-  public BaseEvent(final UUID eventId, final UUID aggregateId, final OffsetDateTime createdAt, long version) {
+  public BaseEvent(UUID eventId, UUID aggregateId, OffsetDateTime createdAt, long version) {
     this.eventId = Objects.requireNonNull(eventId);
     this.aggregateId = Objects.requireNonNull(aggregateId);
     this.createdAt = Objects.requireNonNull(createdAt);

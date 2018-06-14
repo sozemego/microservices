@@ -18,7 +18,7 @@ public class EventStore {
 
   private final Queue<BaseEvent> events = new ConcurrentLinkedQueue<>();
 
-  public List<BaseEvent> getAggregateEvents(final UUID aggregateId) {
+  public List<BaseEvent> getAggregateEvents(UUID aggregateId) {
     try {
       Thread.sleep(500);
     } catch (InterruptedException e) {
@@ -31,7 +31,7 @@ public class EventStore {
              .collect(Collectors.toList());
   }
 
-  public List<BaseEvent> getAggregateEvents(final Set<EventType> eventTypes) {
+  public List<BaseEvent> getAggregateEvents(Set<EventType> eventTypes) {
     return events
              .stream()
              .filter(event -> eventTypes.contains(event.getType()))
@@ -39,7 +39,7 @@ public class EventStore {
   }
 
   @RabbitListener(queues = Config.QUEUE, priority = "99")
-  public void handleMessage(final BaseEvent event) {
+  public void handleMessage(BaseEvent event) {
     System.out.println(event);
     events.add(event);
   }

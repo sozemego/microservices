@@ -28,7 +28,7 @@ public class EventStoreService {
     this.restTemplate = restTemplate;
   }
 
-  public List<BaseEvent> getAggregateEvents(final UUID aggregateId) {
+  public List<BaseEvent> getAggregateEvents(UUID aggregateId) {
     System.out.println("Making request to " + GET_AGGREGATE_EVENTS + aggregateId.toString());
     final ResponseEntity<String> response = restTemplate.getForEntity(
       GET_AGGREGATE_EVENTS + aggregateId.toString(),
@@ -48,7 +48,7 @@ public class EventStoreService {
     return parseJson(response.getBody());
   }
 
-  public List<BaseEvent> getEvents(final List<EventType> eventTypes) {
+  public List<BaseEvent> getEvents(List<EventType> eventTypes) {
     final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     eventTypes.forEach(type -> params.add("type", type.toString()));
 
@@ -68,7 +68,7 @@ public class EventStoreService {
     return parseJson(response.getBody());
   }
 
-  private List<BaseEvent> parseJson(final String json) {
+  private List<BaseEvent> parseJson(String json) {
     final ObjectMapper mapper = new ObjectMapper();
     try {
       return mapper.readValue(

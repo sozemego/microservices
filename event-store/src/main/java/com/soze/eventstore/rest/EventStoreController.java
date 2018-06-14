@@ -24,23 +24,23 @@ public class EventStoreController {
   private final EventStore eventStore;
 
   @Autowired
-  public EventStoreController(final EventStore eventStore) {
+  public EventStoreController(EventStore eventStore) {
     this.eventStore = eventStore;
   }
 
   @GetMapping("/aggregate/{aggregateId}")
-  public ResponseEntity getAggregateEvents(@PathVariable("aggregateId") final String aggregateId) {
+  public ResponseEntity getAggregateEvents(@PathVariable("aggregateId") String aggregateId) {
     final List<BaseEvent> aggregateEvents = eventStore.getAggregateEvents(UUID.fromString(aggregateId));
     return ResponseEntity.ok(aggregateEvents);
   }
 
   @GetMapping("/type")
-  public ResponseEntity getEventsByType(@RequestParam("type") final List<String> types) {
+  public ResponseEntity getEventsByType(@RequestParam("type") List<String> types) {
     final List<BaseEvent> aggregateEvents = eventStore.getAggregateEvents(fromStrings(types));
     return ResponseEntity.ok(aggregateEvents);
   }
 
-  private Set<EventType> fromStrings(final List<String> types) {
+  private Set<EventType> fromStrings(List<String> types) {
     return types
              .stream()
              .map(type -> EventType.valueOf(type))

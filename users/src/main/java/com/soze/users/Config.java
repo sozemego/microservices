@@ -29,12 +29,12 @@ public class Config {
   }
 
   @Bean
-  public RestTemplate restTemplate(final RestTemplateBuilder builder) {
+  public RestTemplate restTemplate(RestTemplateBuilder builder) {
     return builder.build();
   }
 
   @Bean
-  EventStoreService eventStoreService(final RestTemplate restTemplate) {
+  EventStoreService eventStoreService(RestTemplate restTemplate) {
     return new EventStoreService(restTemplate);
   }
 

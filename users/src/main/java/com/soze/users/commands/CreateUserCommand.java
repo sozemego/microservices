@@ -7,7 +7,7 @@ public class CreateUserCommand {
   private final UUID userId;
   private final String name;
 
-  public CreateUserCommand(final UUID userId, final String name) {
+  public CreateUserCommand(UUID userId, String name) {
     this.userId = userId;
     this.name = name;
   }

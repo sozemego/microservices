@@ -24,12 +24,12 @@ public class UserRepository {
   private final Map<UUID, String> userIdNameMap = new ConcurrentHashMap<>();
 
   @Autowired
-  public UserRepository(final EventStoreService eventStoreService) {
+  public UserRepository(EventStoreService eventStoreService) {
     this.eventStoreService = eventStoreService;
   }
 
   @RabbitListener(queues = Config.QUEUE)
-  public void handle(final UserCreatedEvent userCreatedEvent) {
+  public void handle(UserCreatedEvent userCreatedEvent) {
     userIdNameMap.put(userCreatedEvent.getAggregateId(), userCreatedEvent.getName());
   }
 

@@ -7,7 +7,7 @@ public class ReflectionUtils {
 
   private static final String HANDLE = "handle";
 
-  public static void applyEvent(final Object target, final Object event) {
+  public static void applyEvent(Object target, Object event) {
     try {
       final Method method = target.getClass().getMethod(HANDLE, event.getClass());
       method.invoke(target, event);
