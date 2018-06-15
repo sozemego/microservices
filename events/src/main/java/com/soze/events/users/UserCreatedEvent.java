@@ -38,4 +38,11 @@ public class UserCreatedEvent extends BaseEvent {
   public EventType getType() {
     return EventType.USER_CREATED;
   }
+
+  @Override
+  public String toString() {
+    return "UserCreatedEvent{" +
+             "name='" + name + '\'' +
+             "} " + super.toString();
+  }
 }

@@ -18,6 +18,11 @@ public class UserNameChangedEvent extends BaseEvent {
     this.name = Objects.requireNonNull(name);
   }
 
+  public UserNameChangedEvent(UUID aggregateId, OffsetDateTime createdAt, long version, String name) {
+    super(UUID.randomUUID(), aggregateId, createdAt, version);
+    this.name = Objects.requireNonNull(name);
+  }
+
   @JsonCreator
   public UserNameChangedEvent(Map<String, Object> properties) {
     super(properties);
@@ -31,5 +36,12 @@ public class UserNameChangedEvent extends BaseEvent {
   @Override
   public EventType getType() {
     return EventType.USER_NAME_CHANGED;
+  }
+
+  @Override
+  public String toString() {
+    return "UserNameChangedEvent{" +
+             "name='" + name + '\'' +
+             "} " + super.toString();
   }
 }

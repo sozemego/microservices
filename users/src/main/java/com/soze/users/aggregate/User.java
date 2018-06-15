@@ -3,6 +3,8 @@ package com.soze.users.aggregate;
 import com.soze.events.BaseEvent;
 import com.soze.events.users.UserCreatedEvent;
 import com.soze.events.users.UserDeletedEvent;
+import com.soze.events.users.UserNameChangedEvent;
+import com.soze.users.commands.ChangeUserNameCommand;
 import com.soze.users.commands.CreateUserCommand;
 import com.soze.users.commands.DeleteUserCommand;
 
@@ -57,15 +59,29 @@ public class User {
     );
   }
 
-  public void apply(UserCreatedEvent userCreatedEvent) {
-    this.aggregateId = userCreatedEvent.getAggregateId();
-    this.name = userCreatedEvent.getName();
-    setVersion(userCreatedEvent.getVersion());
+  public List<BaseEvent> process(ChangeUserNameCommand command) {
+    if(getName().equals(command.getName())) {
+      throw new IllegalStateException("User with id " + getAggregateId() + " already has name " + command.getName());
+    }
+    return Arrays.asList(
+      new UserNameChangedEvent(command.getAggregateId(), OffsetDateTime.now(), getVersion() + 1, command.getName())
+    );
   }
 
-  public void apply(UserDeletedEvent userDeletedEvent) {
+  public void apply(UserCreatedEvent event) {
+    this.aggregateId = event.getAggregateId();
+    this.name = event.getName();
+    setVersion(event.getVersion());
+  }
+
+  public void apply(UserDeletedEvent event) {
     this.deleted = true;
-    setVersion(userDeletedEvent.getVersion());
+    setVersion(event.getVersion());
+  }
+
+  public void apply(UserNameChangedEvent event) {
+    this.name = event.getName();
+    setVersion(event.getVersion());
   }
 
   @Override

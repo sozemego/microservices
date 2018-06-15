@@ -32,7 +32,7 @@ export class Events extends Component {
     return this.state.events.filter(event => {
       const str = this.getPrettyPrint(event);
       return str.includes(this.state.filter);
-    })
+    }).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   };
 
   render() {

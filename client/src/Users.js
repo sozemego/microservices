@@ -32,6 +32,10 @@ export class Users extends Component {
       .then(this.fetchUsers);
   };
 
+  changeUserName = (id, name) => {
+    return axios.patch("http://localhost:8001/user/" + id + "?name=" + name);
+  };
+
   render() {
     const {users} = this.state;
     return (
@@ -48,7 +52,13 @@ export class Users extends Component {
         {users.map(user => {
           return (
             <div key={user.id} style={{padding: "12px", display: "flex", flexDirection: "row"}}>
-              <div>{user.name}</div>
+              <TextField defaultValue={user.name}
+                         onKeyDown={(event) => {
+                           if(event.keyCode === 13) {
+                               this.changeUserName(user.id, event.target.value);
+                           }
+                         }}
+              />
               <div style={{paddingLeft: "4px", cursor: "pointer"}} onClick={() => this.deleteUser(user.id)}>DELETE</div>
             </div>
           )

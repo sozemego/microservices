@@ -29,4 +29,9 @@ public class UserDeletedEvent extends BaseEvent {
   public EventType getType() {
     return EventType.USER_DELETED;
   }
+
+  @Override
+  public String toString() {
+    return "UserDeletedEvent{} " + super.toString();
+  }
 }

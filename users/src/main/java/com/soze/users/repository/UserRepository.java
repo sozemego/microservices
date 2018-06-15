@@ -3,6 +3,7 @@ package com.soze.users.repository;
 import com.soze.events.BaseEvent;
 import com.soze.events.users.UserCreatedEvent;
 import com.soze.events.users.UserDeletedEvent;
+import com.soze.events.users.UserNameChangedEvent;
 import com.soze.service.EventPublisherService;
 import com.soze.service.EventStoreService;
 import com.soze.users.Config;
@@ -41,21 +42,35 @@ public class UserRepository {
 
   @PostConstruct
   public void setup() {
+    List<EventType> eventTypes = Arrays.asList(
+      EventType.USER_CREATED,
+      EventType.USER_DELETED,
+      EventType.USER_NAME_CHANGED
+    );
+
     eventStoreService
-      .getEvents(Arrays.asList(EventType.USER_CREATED, EventType.USER_DELETED))
+      .getEvents(eventTypes)
       .stream()
       .peek(event -> System.out.println(event))
       .forEach(event -> ReflectionUtils.applyEvent(this, event));
   }
 
-  public void apply(UserCreatedEvent userCreatedEvent) {
-    userIdNameMap.put(userCreatedEvent.getAggregateId(), userCreatedEvent.getName());
-    userNameIdMap.put(userCreatedEvent.getName(), userCreatedEvent.getAggregateId());
+  public void apply(UserCreatedEvent event) {
+    userIdNameMap.put(event.getAggregateId(), event.getName());
+    userNameIdMap.put(event.getName(), event.getAggregateId());
   }
 
-  public void apply(UserDeletedEvent userDeletedEvent) {
-    String username = userIdNameMap.remove(userDeletedEvent.getAggregateId());
+  public void apply(UserDeletedEvent event) {
+    String username = userIdNameMap.remove(event.getAggregateId());
     userNameIdMap.remove(username);
+  }
+
+  public void apply(UserNameChangedEvent event) {
+    String username = userIdNameMap.remove(event.getAggregateId());
+    userNameIdMap.remove(username);
+
+    userIdNameMap.put(event.getAggregateId(), event.getName());
+    userNameIdMap.put(event.getName(), event.getAggregateId());
   }
 
   public List<User> getAllUsers() {
@@ -83,6 +98,7 @@ public class UserRepository {
   }
 
   public boolean nameExists(String name) {
+    System.out.println(userNameIdMap);
     return userNameIdMap.containsKey(name);
   }
 

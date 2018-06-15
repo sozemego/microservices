@@ -42,7 +42,7 @@ public abstract class BaseEvent implements Serializable {
     this.eventId = UUID.fromString((String) properties.get("eventId"));
     this.aggregateId = UUID.fromString((String) properties.get("aggregateId"));
     this.createdAt = OffsetDateTime.parse((String) properties.get("createdAt"));
-    this.version = (long) properties.get("version");
+    this.version = Long.valueOf((int) properties.get("version"));
   }
 
   public UUID getEventId() {
@@ -72,4 +72,13 @@ public abstract class BaseEvent implements Serializable {
     USER_CREATED, USER_DELETED, USER_NAME_CHANGED
   }
 
+  @Override
+  public String toString() {
+    return "BaseEvent{" +
+             "eventId=" + eventId +
+             ", aggregateId=" + aggregateId +
+             ", createdAt=" + createdAt +
+             ", version=" + version +
+             '}';
+  }
 }

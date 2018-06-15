@@ -2,6 +2,7 @@ package com.soze.users.service;
 
 import com.soze.events.BaseEvent;
 import com.soze.users.aggregate.User;
+import com.soze.users.commands.ChangeUserNameCommand;
 import com.soze.users.commands.CreateUserCommand;
 import com.soze.users.commands.DeleteUserCommand;
 import com.soze.users.repository.UserRepository;
@@ -46,6 +47,24 @@ public class UserService {
     } else {
       deleteUser(deleteUserCommand);
     }
+  }
+
+  public void changeUserName(ChangeUserNameCommand command) {
+    if(!userRepository.aggregateIdExists(command.getAggregateId())) {
+      throw new IllegalStateException("User with id " + command.getAggregateId() + " does not exist");
+    }
+    if(userRepository.nameExists(command.getName())) {
+      throw new IllegalStateException("User with name " + command.getName() + " already exists");
+    }
+    User user = getUser(command.getAggregateId());
+    final long version = user.getVersion();
+    List<BaseEvent> events = ReflectionUtils.processCommand(user, command);
+    if(userRepository.getAggregateVersion(command.getAggregateId()) == version) {
+      userRepository.publish(events);
+    } else {
+      changeUserName(command);
+    }
+
   }
 
   public User getUser(UUID aggregateId) {
