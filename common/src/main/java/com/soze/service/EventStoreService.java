@@ -30,14 +30,12 @@ public class EventStoreService {
   }
 
   public List<BaseEvent> getAggregateEvents(UUID aggregateId) {
-    System.out.println("Making request to " + GET_AGGREGATE_EVENTS + aggregateId.toString());
     final ResponseEntity<String> response = get(GET_AGGREGATE_EVENTS + aggregateId.toString(), String.class, 5);
 
     return parseJson(response.getBody());
   }
 
   public List<BaseEvent> getAllEvents() {
-    System.out.println("Making request to " + GET_ALL_EVENTS);
     final ResponseEntity<String> response = get(GET_ALL_EVENTS, String.class, 5);
 
     return parseJson(response.getBody());
