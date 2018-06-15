@@ -9,6 +9,7 @@ export class Events extends Component {
     this.fetchEvents();
     this.state = {
       events: [],
+      filter: "",
     };
   }
 
@@ -22,12 +23,24 @@ export class Events extends Component {
       .then(events => this.setState({events}));
   };
 
+  getPrettyPrint = (event) => {
+    const str = JSON.stringify(event, null, 2);
+    return str.slice(1, str.length - 1);
+  };
+
+  getEvents = () => {
+    return this.state.events.filter(event => {
+      const str = this.getPrettyPrint(event);
+      return str.includes(this.state.filter);
+    })
+  };
+
   render() {
-    const {events} = this.state;
     return (
       <div>
         <TextField id={"name"}
                    label={"name"}
+                   onChange={(e) => this.setState({filter: e.target.value})}
                    onKeyDown={(event) => {
                      if(event.keyCode === 13) {
                        // this.createUser(event.target.value);
@@ -35,10 +48,10 @@ export class Events extends Component {
                      }
                    }}
         />
-        {events.map(event => {
+        {this.getEvents().map(event => {
           return (
             <div key={event.eventId} style={{border: "1px solid black", margin: "2px"}}>
-              <pre>{JSON.stringify(event, null, 2)}</pre>
+              <pre>{this.getPrettyPrint(event)}</pre>
             </div>
           )
         })}
