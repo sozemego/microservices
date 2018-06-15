@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import static com.soze.events.BaseEvent.*;
 
 @Repository
-@RabbitListener(queues = Config.QUEUE)
 public class UserRepository {
 
   private final EventStoreService eventStoreService;
@@ -49,13 +48,11 @@ public class UserRepository {
       .forEach(event -> ReflectionUtils.applyEvent(this, event));
   }
 
-  @RabbitHandler
   public void apply(UserCreatedEvent userCreatedEvent) {
     userIdNameMap.put(userCreatedEvent.getAggregateId(), userCreatedEvent.getName());
     userNameIdMap.put(userCreatedEvent.getName(), userCreatedEvent.getAggregateId());
   }
 
-  @RabbitHandler
   public void apply(UserDeletedEvent userDeletedEvent) {
     String username = userIdNameMap.remove(userDeletedEvent.getAggregateId());
     userNameIdMap.remove(username);
@@ -94,6 +91,7 @@ public class UserRepository {
   }
 
   public void publish(List<BaseEvent> events) {
+    events.forEach(event -> ReflectionUtils.applyEvent(this, event));
     eventPublisherService.sendEvents(Config.EXCHANGE, "", events);
   }
 

@@ -24,6 +24,7 @@ public class UserService {
   }
 
   public void createUser(CreateUserCommand command) {
+    System.out.println(command);
     if(userRepository.nameExists(command.getName())) {
       throw new IllegalStateException("Username already exists");
     }
@@ -33,6 +34,7 @@ public class UserService {
   }
 
   public void deleteUser(DeleteUserCommand deleteUserCommand) {
+    System.out.println(deleteUserCommand);
     if(!userRepository.aggregateIdExists(deleteUserCommand.getAggregateId())) {
       throw new IllegalStateException("User with id " + deleteUserCommand.getAggregateId() + " does not exist");
     }
