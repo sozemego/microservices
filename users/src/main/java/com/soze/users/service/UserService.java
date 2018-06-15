@@ -5,7 +5,7 @@ import com.soze.users.aggregate.User;
 import com.soze.users.commands.CreateUserCommand;
 import com.soze.users.commands.DeleteUserCommand;
 import com.soze.users.repository.UserRepository;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import com.soze.utils.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +28,7 @@ public class UserService {
       throw new IllegalStateException("Username already exists");
     }
     User user = new User();
-    List<BaseEvent> events = user.process(command);
+    List<BaseEvent> events = ReflectionUtils.processCommand(user, command);
     userRepository.publish(events);
   }
 
@@ -38,7 +38,7 @@ public class UserService {
     }
     User user = getUser(deleteUserCommand.getAggregateId());
     final long version = user.getVersion();
-    List<BaseEvent> events = user.process(deleteUserCommand);
+    List<BaseEvent> events = ReflectionUtils.processCommand(user, deleteUserCommand);
     if(userRepository.getAggregateVersion(deleteUserCommand.getAggregateId()) == version) {
       userRepository.publish(events);
     } else {
