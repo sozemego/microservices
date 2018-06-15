@@ -28,6 +28,12 @@ public class EventStoreController {
     this.eventStore = eventStore;
   }
 
+  @GetMapping("/")
+  public ResponseEntity getAllEvents() {
+    final List<BaseEvent> aggregateEvents = eventStore.getAllEvents();
+    return ResponseEntity.ok(aggregateEvents);
+  }
+
   @GetMapping("/aggregate/{aggregateId}")
   public ResponseEntity getAggregateEvents(@PathVariable("aggregateId") String aggregateId,
                                            @RequestParam(defaultValue = "false") boolean latest) {

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import { Tab, Tabs } from "@material-ui/core/es/index";
 import { Users } from "./Users";
+import { Events } from "./Events";
 
 class App extends Component {
 
@@ -20,8 +21,10 @@ class App extends Component {
           <Tab label={"Users"}/>
           <Tab label={"Items"}/>
           <Tab label={"Orders"}/>
+          <Tab label={"Events"}/>
         </Tabs>
         {this.state.value === 0 && <Users />}
+        {this.state.value === 3 && <Events />}
       </div>
     );
   }

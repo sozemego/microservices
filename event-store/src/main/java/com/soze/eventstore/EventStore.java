@@ -36,6 +36,10 @@ public class EventStore {
     loadEvents();
   }
 
+  public List<BaseEvent> getAllEvents() {
+    return new ArrayList<>(events);
+  }
+
   public List<BaseEvent> getAggregateEvents(UUID aggregateId, boolean latest) {
     final List<BaseEvent> events = getAggregateEvents(aggregateId);
     if(events.isEmpty()) {

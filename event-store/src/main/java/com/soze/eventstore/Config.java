@@ -5,9 +5,11 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class Config {
+public class Config implements WebMvcConfigurer {
 
   public static final String QUEUE = "EVENT_STORE_QUEUE";
   public static final String EXCHANGE = "EXCHANGE";
@@ -25,6 +27,13 @@ public class Config {
   @Bean
   Binding fanoutBinding(Queue queue, FanoutExchange fanoutExchange) {
     return BindingBuilder.bind(queue).to(fanoutExchange);
+  }
+
+  @Override
+  public void addCorsMappings(final CorsRegistry registry) {
+    registry.addMapping("/**")
+      .allowedOrigins("*")
+      .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
   }
 
   @Bean
