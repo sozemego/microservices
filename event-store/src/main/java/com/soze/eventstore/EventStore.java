@@ -37,12 +37,6 @@ public class EventStore {
   }
 
   public List<BaseEvent> getAggregateEvents(UUID aggregateId, boolean latest) {
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-
     final List<BaseEvent> events = getAggregateEvents(aggregateId);
     if(events.isEmpty()) {
       return events;
