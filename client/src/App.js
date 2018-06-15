@@ -1,18 +1,27 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { Tab, Tabs } from "@material-ui/core/es/index";
+import { Users } from "./Users";
 
 class App extends Component {
+
+  state = {
+    value: 0,
+  };
+
+  handleChange = (event, value) => {
+    this.setState({ value });
+  };
+
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+        <Tabs value={this.state.value} onChange={this.handleChange}>
+          <Tab label={"Users"}/>
+          <Tab label={"Items"}/>
+          <Tab label={"Orders"}/>
+        </Tabs>
+        {this.state.value === 0 && <Users />}
       </div>
     );
   }

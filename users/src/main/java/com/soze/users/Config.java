@@ -15,9 +15,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.handler.annotation.support.DefaultMessageHandlerMethodFactory;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
-public class Config {
+public class Config implements WebMvcConfigurer {
 
   public static final String QUEUE = "USER_QUEUE";
   public static final String EXCHANGE = "EXCHANGE";
@@ -41,35 +44,13 @@ public class Config {
   public AmqpAdmin amqpAdmin(ConnectionFactory connectionFactory) {
     return new RabbitAdmin(connectionFactory);
   }
-//
-//  @Bean
-//  public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory) {
-//    final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-//    rabbitTemplate.setMessageConverter(producerJackson2MessageConverter());
-//    return rabbitTemplate;
-//  }
-//
-//  @Bean
-//  public MappingJackson2MessageConverter consumerJackson2MessageConverter() {
-//    return new MappingJackson2MessageConverter();
-//  }
-//
-//  @Bean
-//  public DefaultMessageHandlerMethodFactory messageHandlerMethodFactory() {
-//    DefaultMessageHandlerMethodFactory factory = new DefaultMessageHandlerMethodFactory();
-//    factory.setMessageConverter(consumerJackson2MessageConverter());
-//    return factory;
-//  }
-//
-//  @Override
-//  public void configureRabbitListeners(final RabbitListenerEndpointRegistrar registrar) {
-//    registrar.setMessageHandlerMethodFactory(messageHandlerMethodFactory());
-//  }
-//
-//  @Bean
-//  public Jackson2JsonMessageConverter producerJackson2MessageConverter() {
-//    return new Jackson2JsonMessageConverter();
-//  }
+
+  @Override
+  public void addCorsMappings(final CorsRegistry registry) {
+    registry.addMapping("/**")
+      .allowedOrigins("*")
+      .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
+  }
 
   @Bean
   public RestTemplate restTemplate(RestTemplateBuilder builder) {
