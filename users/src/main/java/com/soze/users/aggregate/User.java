@@ -68,4 +68,13 @@ public class User {
     setVersion(userDeletedEvent.getVersion());
   }
 
+  @Override
+  public String toString() {
+    return "User{" +
+             "aggregateId=" + aggregateId +
+             ", name='" + name + '\'' +
+             ", version=" + version +
+             ", deleted=" + deleted +
+             '}';
+  }
 }
