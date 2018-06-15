@@ -1,7 +1,7 @@
 package com.soze.users.aggregate;
 
 import com.soze.events.BaseEvent;
-import com.soze.events.users.UserCreationStartedEvent;
+import com.soze.events.users.UserCreatedEvent;
 import com.soze.users.commands.CreateUserCommand;
 
 import java.time.OffsetDateTime;
@@ -39,14 +39,14 @@ public class User {
 
     public List<BaseEvent> process(CreateUserCommand command) {
         return Arrays.asList(
-          new UserCreationStartedEvent(command.getUserId(), OffsetDateTime.now(), getVersion() + 1, command.getName())
+          new UserCreatedEvent(command.getUserId(), OffsetDateTime.now(), getVersion() + 1, command.getName())
         );
     }
 
-    public void apply(UserCreationStartedEvent userCreationStartedEvent) {
-        this.aggregateId = userCreationStartedEvent.getAggregateId();
-        this.name = userCreationStartedEvent.getName();
-        setVersion(userCreationStartedEvent.getVersion());
+    public void apply(UserCreatedEvent userCreatedEvent) {
+        this.aggregateId = userCreatedEvent.getAggregateId();
+        this.name = userCreatedEvent.getName();
+        setVersion(userCreatedEvent.getVersion());
     }
 
 

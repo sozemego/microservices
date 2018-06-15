@@ -1,6 +1,8 @@
 package com.soze.eventstore;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,6 +25,11 @@ public class Config {
   @Bean
   Binding fanoutBinding(Queue queue, FanoutExchange fanoutExchange) {
     return BindingBuilder.bind(queue).to(fanoutExchange);
+  }
+
+  @Bean
+  public AmqpAdmin amqpAdmin(ConnectionFactory connectionFactory) {
+    return new RabbitAdmin(connectionFactory);
   }
 
 

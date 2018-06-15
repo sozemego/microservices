@@ -31,10 +31,7 @@ public class EventStoreService {
 
   public List<BaseEvent> getAggregateEvents(UUID aggregateId) {
     System.out.println("Making request to " + GET_AGGREGATE_EVENTS + aggregateId.toString());
-    final ResponseEntity<String> response = restTemplate.getForEntity(
-      GET_AGGREGATE_EVENTS + aggregateId.toString(),
-      String.class
-    );
+    final ResponseEntity<String> response = get(GET_AGGREGATE_EVENTS + aggregateId.toString(), String.class, 5);
 
     return parseJson(response.getBody());
   }
@@ -56,13 +53,8 @@ public class EventStoreService {
                                           .build();
 
     final String uri = uriComponents.toUriString();
-    System.out.println("Making request to " + uri);
 
-    final ResponseEntity<String> response = restTemplate.getForEntity(
-      uri,
-      String.class
-    );
-
+    final ResponseEntity<String> response = get(uri, String.class, 5);
     return parseJson(response.getBody());
   }
 

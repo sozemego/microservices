@@ -1,9 +1,7 @@
 package com.soze.users.repository;
 
 import com.soze.events.BaseEvent;
-import com.soze.events.users.UserCreationApprovedEvent;
-import com.soze.events.users.UserCreationDeclinedEvent;
-import com.soze.events.users.UserCreationStartedEvent;
+import com.soze.events.users.UserCreatedEvent;
 import com.soze.service.EventPublisherService;
 import com.soze.service.EventStoreService;
 import com.soze.users.Config;
@@ -25,38 +23,15 @@ public class UserRepository {
 
   private final EventStoreService eventStoreService;
   private final Map<UUID, String> userIdNameMap = new ConcurrentHashMap<>();
-  private final EventPublisherService eventPublisherService;
 
   @Autowired
-  public UserRepository(EventStoreService eventStoreService,
-                        EventPublisherService eventPublisherService) {
+  public UserRepository(EventStoreService eventStoreService) {
     this.eventStoreService = eventStoreService;
-    this.eventPublisherService = eventPublisherService;
   }
 
   @RabbitListener(queues = Config.QUEUE)
-  public void handle(UserCreationStartedEvent userCreationStartedEvent) {
-    if (nameExists(userCreationStartedEvent.getName())) {
-      eventPublisherService.sendEvent(
-        Config.QUEUE,
-        "",
-        new UserCreationDeclinedEvent(
-          userCreationStartedEvent.getAggregateId(),
-          OffsetDateTime.now(),
-          userCreationStartedEvent.getVersion() + 1,
-          "Name already exists"
-        ));
-    } else {
-      userIdNameMap.put(userCreationStartedEvent.getAggregateId(), userCreationStartedEvent.getName());
-      eventPublisherService.sendEvent(
-        Config.QUEUE,
-        "",
-        new UserCreationApprovedEvent(
-          userCreationStartedEvent.getAggregateId(),
-          OffsetDateTime.now(),
-          userCreationStartedEvent.getVersion() + 1
-        ));
-    }
+  public void apply(UserCreatedEvent userCreatedEvent) {
+    userIdNameMap.put(userCreatedEvent.getAggregateId(), userCreatedEvent.getName());
   }
 
   public List<User> getAllUsers() {
@@ -70,7 +45,8 @@ public class UserRepository {
                  ReflectionUtils.applyEvent(user, event);
                }
                return user;
-             }).collect(Collectors.toList());
+             })
+             .collect(Collectors.toList());
   }
 
   public boolean nameExists(String name) {

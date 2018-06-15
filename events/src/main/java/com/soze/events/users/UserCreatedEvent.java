@@ -7,26 +7,26 @@ import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
 
-public class UserCreationStartedEvent extends BaseEvent {
+public class UserCreatedEvent extends BaseEvent {
 
   private final String name;
 
-  public UserCreationStartedEvent(UUID eventId,
-                                  UUID aggregateId,
-                                  OffsetDateTime createdAt,
-                                  long version,
-                                  String name) {
+  public UserCreatedEvent(UUID eventId,
+                          UUID aggregateId,
+                          OffsetDateTime createdAt,
+                          long version,
+                          String name) {
     super(eventId, aggregateId, createdAt, version);
     this.name = name;
   }
 
-  public UserCreationStartedEvent(UUID aggregateId, OffsetDateTime createdAt, long version, String name) {
+  public UserCreatedEvent(UUID aggregateId, OffsetDateTime createdAt, long version, String name) {
     this(UUID.randomUUID(), aggregateId, createdAt, version, name);
   }
 
   @JsonCreator
-  public static UserCreationStartedEvent factory(Map<String, Object> properties) {
-    return new UserCreationStartedEvent(
+  public static UserCreatedEvent factory(Map<String, Object> properties) {
+    return new UserCreatedEvent(
       UUID.fromString((String) properties.get("eventId")),
       UUID.fromString((String) properties.get("aggregateId")),
       OffsetDateTime.parse((String) properties.get("createdAt")),
@@ -41,6 +41,6 @@ public class UserCreationStartedEvent extends BaseEvent {
 
   @Override
   public EventType getType() {
-    return EventType.USER_CREATION_STARTED;
+    return EventType.USER_CREATED;
   }
 }

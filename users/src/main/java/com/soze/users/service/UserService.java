@@ -27,7 +27,7 @@ public class UserService {
   @PostConstruct
   public void setup() {
     eventStoreService
-      .getEvents(Arrays.asList(EventType.USER_CREATION_STARTED))
+      .getEvents(Arrays.asList(EventType.USER_CREATED))
       .stream()
       .peek(event -> System.out.println(event))
       .forEach(event -> ReflectionUtils.applyEvent(userRepository, event));
@@ -43,6 +43,9 @@ public class UserService {
   }
 
   public void createUser(CreateUserCommand command) {
+    if(userRepository.nameExists(command.getName())) {
+      throw new IllegalStateException("Username already exists");
+    }
     User user = new User();
     List<BaseEvent> events = user.process(command);
     eventPublisherService.sendEvents(Config.EXCHANGE, "", events);
