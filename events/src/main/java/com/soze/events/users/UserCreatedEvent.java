@@ -25,14 +25,9 @@ public class UserCreatedEvent extends BaseEvent {
   }
 
   @JsonCreator
-  public static UserCreatedEvent factory(Map<String, Object> properties) {
-    return new UserCreatedEvent(
-      UUID.fromString((String) properties.get("eventId")),
-      UUID.fromString((String) properties.get("aggregateId")),
-      OffsetDateTime.parse((String) properties.get("createdAt")),
-      (int) properties.get("version"),
-      (String) properties.get("name")
-    );
+  public UserCreatedEvent(Map<String, Object> properties) {
+    super(properties);
+    this.name = (String) properties.get("name");
   }
 
   public String getName() {

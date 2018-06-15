@@ -1,14 +1,13 @@
 package com.soze.events;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.*;
 import com.soze.events.users.UserCreatedEvent;
 import com.soze.events.users.UserDeletedEvent;
+import com.soze.events.users.UserNameChangedEvent;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -20,7 +19,8 @@ import java.util.UUID;
 )
 @JsonSubTypes({
   @JsonSubTypes.Type(value = UserCreatedEvent.class, name = "USER_CREATED"),
-  @JsonSubTypes.Type(value = UserDeletedEvent.class, name = "USER_DELETED")
+  @JsonSubTypes.Type(value = UserDeletedEvent.class, name = "USER_DELETED"),
+  @JsonSubTypes.Type(value = UserNameChangedEvent.class, name = "USER_NAME_CHANGED")
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class BaseEvent implements Serializable {
@@ -35,6 +35,14 @@ public abstract class BaseEvent implements Serializable {
     this.aggregateId = Objects.requireNonNull(aggregateId);
     this.createdAt = Objects.requireNonNull(createdAt);
     this.version = version;
+  }
+
+  @JsonCreator
+  public BaseEvent(Map<String, Object> properties) {
+    this.eventId = UUID.fromString((String) properties.get("eventId"));
+    this.aggregateId = UUID.fromString((String) properties.get("aggregateId"));
+    this.createdAt = OffsetDateTime.parse((String) properties.get("createdAt"));
+    this.version = (long) properties.get("version");
   }
 
   public UUID getEventId() {
@@ -61,7 +69,7 @@ public abstract class BaseEvent implements Serializable {
   public abstract EventType getType();
 
   public enum EventType {
-    USER_CREATED, USER_DELETED
+    USER_CREATED, USER_DELETED, USER_NAME_CHANGED
   }
 
 }

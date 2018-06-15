@@ -21,13 +21,8 @@ public class UserDeletedEvent extends BaseEvent {
   }
 
   @JsonCreator
-  public static UserDeletedEvent factory(Map<String, Object> properties) {
-    return new UserDeletedEvent(
-      UUID.fromString((String) properties.get("eventId")),
-      UUID.fromString((String) properties.get("aggregateId")),
-      OffsetDateTime.parse((String) properties.get("createdAt")),
-      (int) properties.get("version")
-    );
+  public UserDeletedEvent(Map<String, Object> properties) {
+    super(properties);
   }
 
   @Override
