@@ -29,8 +29,9 @@ public class EventStoreController {
   }
 
   @GetMapping("/aggregate/{aggregateId}")
-  public ResponseEntity getAggregateEvents(@PathVariable("aggregateId") String aggregateId) {
-    final List<BaseEvent> aggregateEvents = eventStore.getAggregateEvents(UUID.fromString(aggregateId));
+  public ResponseEntity getAggregateEvents(@PathVariable("aggregateId") String aggregateId,
+                                           @RequestParam(defaultValue = "false") boolean latest) {
+    final List<BaseEvent> aggregateEvents = eventStore.getAggregateEvents(UUID.fromString(aggregateId), latest);
     return ResponseEntity.ok(aggregateEvents);
   }
 

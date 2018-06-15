@@ -56,6 +56,13 @@ public class EventStoreService {
     return parseJson(response.getBody());
   }
 
+  public long getAggregateVersion(UUID aggregateId) {
+    final ResponseEntity<String> response = get(GET_AGGREGATE_EVENTS + aggregateId.toString() + "?latest=true", String.class, 5);
+
+    List<BaseEvent> events = parseJson(response.getBody());
+    return events.isEmpty() ? -1 : events.get(0).getVersion();
+  }
+
   private List<BaseEvent> parseJson(String json) {
     final ObjectMapper mapper = new ObjectMapper();
     try {
