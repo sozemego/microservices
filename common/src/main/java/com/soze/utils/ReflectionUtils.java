@@ -1,5 +1,6 @@
 package com.soze.utils;
 
+import com.soze.aggregate.Aggregate;
 import com.soze.events.BaseEvent;
 
 import java.lang.reflect.InvocationTargetException;
@@ -19,7 +20,11 @@ public class ReflectionUtils {
     invoke(method, target, event);
   }
 
-  public static List<BaseEvent> processCommand(Object target, Object event) {
+  public static void applyEvents(Object target, List<BaseEvent> events) {
+    events.forEach(event -> applyEvent(target, event));
+  }
+
+  public static List<BaseEvent> processCommand(Aggregate target, Object event) {
     Method method = getMethod(PROCESS, target, event.getClass());
     try {
       Object returnValue = method.invoke(target, event);

@@ -38,12 +38,6 @@
         </dependency>
         <dependency>
             <groupId>com.soze</groupId>
-            <artifactId>events</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.soze</groupId>
             <artifactId>common</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>

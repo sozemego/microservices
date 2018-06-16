@@ -1,9 +1,7 @@
 package com.soze.events;
 
 import com.fasterxml.jackson.annotation.*;
-import com.soze.events.users.UserCreatedEvent;
-import com.soze.events.users.UserDeletedEvent;
-import com.soze.events.users.UserNameChangedEvent;
+import com.soze.aggregate.AggregateId;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
@@ -26,11 +24,11 @@ import java.util.UUID;
 public abstract class BaseEvent implements Serializable {
 
   private final UUID eventId;
-  private final UUID aggregateId;
+  private final AggregateId aggregateId;
   private final OffsetDateTime createdAt;
   private final long version;
 
-  public BaseEvent(UUID eventId, UUID aggregateId, OffsetDateTime createdAt, long version) {
+  public BaseEvent(UUID eventId, AggregateId aggregateId, OffsetDateTime createdAt, long version) {
     this.eventId = Objects.requireNonNull(eventId);
     this.aggregateId = Objects.requireNonNull(aggregateId);
     this.createdAt = Objects.requireNonNull(createdAt);
@@ -40,7 +38,7 @@ public abstract class BaseEvent implements Serializable {
   @JsonCreator
   public BaseEvent(Map<String, Object> properties) {
     this.eventId = UUID.fromString((String) properties.get("eventId"));
-    this.aggregateId = UUID.fromString((String) properties.get("aggregateId"));
+    this.aggregateId = AggregateId.fromString((String) properties.get("aggregateId"));
     this.createdAt = OffsetDateTime.parse((String) properties.get("createdAt"));
     this.version = Long.valueOf((int) properties.get("version"));
   }
@@ -49,7 +47,7 @@ public abstract class BaseEvent implements Serializable {
     return eventId;
   }
 
-  public UUID getAggregateId() {
+  public AggregateId getAggregateId() {
     return aggregateId;
   }
 

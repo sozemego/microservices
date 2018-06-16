@@ -1,18 +1,18 @@
 package com.soze.users.commands;
 
-import java.util.UUID;
+import com.soze.aggregate.AggregateId;
 
 public class ChangeUserNameCommand {
 
-  private final UUID aggregateId;
+  private final AggregateId aggregateId;
   private final String name;
 
-  public ChangeUserNameCommand(UUID aggregateId, String name) {
+  public ChangeUserNameCommand(AggregateId aggregateId, String name) {
     this.aggregateId = aggregateId;
     this.name = name;
   }
 
-  public UUID getAggregateId() {
+  public AggregateId getAggregateId() {
     return aggregateId;
   }
 

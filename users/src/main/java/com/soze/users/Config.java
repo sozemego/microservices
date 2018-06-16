@@ -1,7 +1,10 @@
 package com.soze.users;
 
+import com.soze.repository.SourcedRepository;
+import com.soze.repository.SourcedRepositoryImpl;
 import com.soze.service.EventPublisherService;
 import com.soze.service.EventStoreService;
+import com.soze.users.aggregate.User;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -65,6 +68,12 @@ public class Config implements WebMvcConfigurer {
   @Bean
   EventPublisherService eventPublisherService(RabbitTemplate rabbitTemplate) {
     return new EventPublisherService(rabbitTemplate);
+  }
+
+  @Bean
+  SourcedRepository<User> userSourcedRepository(EventStoreService eventStoreService,
+                                                EventPublisherService eventPublisherService) {
+    return new SourcedRepositoryImpl<>(eventStoreService, eventPublisherService, EXCHANGE);
   }
 
 }

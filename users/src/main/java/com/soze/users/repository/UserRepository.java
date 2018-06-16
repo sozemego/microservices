@@ -1,16 +1,15 @@
 package com.soze.users.repository;
 
+import com.soze.aggregate.AggregateId;
 import com.soze.events.BaseEvent;
-import com.soze.events.users.UserCreatedEvent;
-import com.soze.events.users.UserDeletedEvent;
-import com.soze.events.users.UserNameChangedEvent;
+import com.soze.events.UserCreatedEvent;
+import com.soze.events.UserDeletedEvent;
+import com.soze.events.UserNameChangedEvent;
 import com.soze.service.EventPublisherService;
 import com.soze.service.EventStoreService;
 import com.soze.users.Config;
 import com.soze.users.aggregate.User;
 import com.soze.utils.ReflectionUtils;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -18,7 +17,6 @@ import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -30,12 +28,12 @@ public class UserRepository {
   private final EventStoreService eventStoreService;
   private final EventPublisherService eventPublisherService;
 
-  private final Map<UUID, String> userIdNameMap = new ConcurrentHashMap<>();
-  private final Map<String, UUID> userNameIdMap = new ConcurrentHashMap<>();
+  private final Map<AggregateId, String> userIdNameMap = new ConcurrentHashMap<>();
+  private final Map<String, AggregateId> userNameIdMap = new ConcurrentHashMap<>();
 
   @Autowired
   public UserRepository(EventStoreService eventStoreService,
-                        final EventPublisherService eventPublisherService) {
+                        EventPublisherService eventPublisherService) {
     this.eventStoreService = eventStoreService;
     this.eventPublisherService = eventPublisherService;
   }
@@ -88,7 +86,7 @@ public class UserRepository {
              .collect(Collectors.toList());
   }
 
-  public User getUser(UUID aggregateId) {
+  public User getUser(AggregateId aggregateId) {
     List<BaseEvent> events = eventStoreService.getAggregateEvents(aggregateId);
     User user = new User();
     for (BaseEvent event : events) {
@@ -102,7 +100,7 @@ public class UserRepository {
     return userNameIdMap.containsKey(name);
   }
 
-  public boolean aggregateIdExists(UUID aggregateId) {
+  public boolean aggregateIdExists(AggregateId aggregateId) {
     return userIdNameMap.containsKey(aggregateId);
   }
 
@@ -111,7 +109,7 @@ public class UserRepository {
     eventPublisherService.sendEvents(Config.EXCHANGE, "", events);
   }
 
-  public long getAggregateVersion(UUID aggregateId) {
+  public long getAggregateVersion(AggregateId aggregateId) {
     return eventStoreService.getAggregateVersion(aggregateId);
   }
 

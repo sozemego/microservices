@@ -1,9 +1,11 @@
 package com.soze.users.aggregate;
 
+import com.soze.aggregate.Aggregate;
+import com.soze.aggregate.AggregateId;
 import com.soze.events.BaseEvent;
-import com.soze.events.users.UserCreatedEvent;
-import com.soze.events.users.UserDeletedEvent;
-import com.soze.events.users.UserNameChangedEvent;
+import com.soze.events.UserCreatedEvent;
+import com.soze.events.UserDeletedEvent;
+import com.soze.events.UserNameChangedEvent;
 import com.soze.users.commands.ChangeUserNameCommand;
 import com.soze.users.commands.CreateUserCommand;
 import com.soze.users.commands.DeleteUserCommand;
@@ -11,11 +13,10 @@ import com.soze.users.commands.DeleteUserCommand;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
-public class User {
+public class User implements Aggregate {
 
-  private UUID aggregateId;
+  private AggregateId aggregateId;
 
   private String name;
 
@@ -27,7 +28,7 @@ public class User {
 
   }
 
-  public UUID getAggregateId() {
+  public AggregateId getAggregateId() {
     return aggregateId;
   }
 

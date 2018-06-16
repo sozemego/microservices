@@ -1,16 +1,16 @@
 package com.soze.users.commands;
 
-import java.util.UUID;
+import com.soze.aggregate.AggregateId;
 
 public class DeleteUserCommand {
 
-  private final UUID aggregateId;
+  private final AggregateId aggregateId;
 
-  public DeleteUserCommand(final UUID aggregateId) {
+  public DeleteUserCommand(final AggregateId aggregateId) {
     this.aggregateId = aggregateId;
   }
 
-  public UUID getAggregateId() {
+  public AggregateId getAggregateId() {
     return aggregateId;
   }
 }

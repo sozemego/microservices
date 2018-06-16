@@ -1,7 +1,7 @@
-package com.soze.events.users;
+package com.soze.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.soze.events.BaseEvent;
+import com.soze.aggregate.AggregateId;
 
 import java.time.OffsetDateTime;
 import java.util.Map;
@@ -12,7 +12,7 @@ public class UserCreatedEvent extends BaseEvent {
   private final String name;
 
   public UserCreatedEvent(UUID eventId,
-                          UUID aggregateId,
+                          AggregateId aggregateId,
                           OffsetDateTime createdAt,
                           long version,
                           String name) {
@@ -20,7 +20,7 @@ public class UserCreatedEvent extends BaseEvent {
     this.name = name;
   }
 
-  public UserCreatedEvent(UUID aggregateId, OffsetDateTime createdAt, long version, String name) {
+  public UserCreatedEvent(AggregateId aggregateId, OffsetDateTime createdAt, long version, String name) {
     this(UUID.randomUUID(), aggregateId, createdAt, version, name);
   }
 

@@ -1,6 +1,7 @@
 package com.soze.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.soze.aggregate.AggregateId;
 import com.soze.events.BaseEvent;
 import com.soze.events.BaseEvent.EventType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class EventStoreService {
     this.restTemplate = restTemplate;
   }
 
-  public List<BaseEvent> getAggregateEvents(UUID aggregateId) {
+  public List<BaseEvent> getAggregateEvents(AggregateId aggregateId) {
     final ResponseEntity<String> response = get(GET_AGGREGATE_EVENTS + aggregateId.toString(), String.class, 5);
 
     return parseJson(response.getBody());
@@ -56,7 +57,7 @@ public class EventStoreService {
     return parseJson(response.getBody());
   }
 
-  public long getAggregateVersion(UUID aggregateId) {
+  public long getAggregateVersion(AggregateId aggregateId) {
     final ResponseEntity<String> response = get(GET_AGGREGATE_EVENTS + aggregateId.toString() + "?latest=true", String.class, 5);
 
     List<BaseEvent> events = parseJson(response.getBody());

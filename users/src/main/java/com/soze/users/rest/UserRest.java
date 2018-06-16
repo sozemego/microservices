@@ -1,5 +1,6 @@
 package com.soze.users.rest;
 
+import com.soze.aggregate.AggregateId;
 import com.soze.users.commands.ChangeUserNameCommand;
 import com.soze.users.commands.CreateUserCommand;
 import com.soze.users.commands.DeleteUserCommand;
@@ -32,26 +33,26 @@ public class UserRest {
 
   @GetMapping("/{aggregateId}")
   public ResponseEntity getUser(@PathVariable("aggregateId") String aggregateId) {
-    final UserDto dto = UserDtoConverter.convertToDto(userService.getUser(UUID.fromString(aggregateId)));
+    final UserDto dto = UserDtoConverter.convertToDto(userService.getUser(AggregateId.fromString(aggregateId)));
     return ResponseEntity.ok(dto);
   }
 
   @PostMapping("/{name}")
   public ResponseEntity createUser(@PathVariable("name") String name) {
-    userService.createUser(new CreateUserCommand(UUID.randomUUID(), name));
+    userService.createUser(new CreateUserCommand(AggregateId.create(), name));
     return ResponseEntity.ok().build();
   }
 
   @PatchMapping("/{aggregateId}")
   public ResponseEntity changeUserName(@PathVariable("aggregateId") String aggregateId,
                                        @RequestParam("name") String name) {
-    userService.changeUserName(new ChangeUserNameCommand(UUID.fromString(aggregateId), name));
+    userService.changeUserName(new ChangeUserNameCommand(AggregateId.fromString(aggregateId), name));
     return ResponseEntity.ok().build();
   }
 
   @DeleteMapping("/{aggregateId}")
   public ResponseEntity deleteUser(@PathVariable("aggregateId") String aggregateId) {
-    userService.deleteUser(new DeleteUserCommand(UUID.fromString(aggregateId)));
+    userService.deleteUser(new DeleteUserCommand(AggregateId.fromString(aggregateId)));
     return ResponseEntity.ok().build();
   }
 }

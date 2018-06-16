@@ -1,6 +1,8 @@
 package com.soze.users.service;
 
+import com.soze.aggregate.AggregateId;
 import com.soze.events.BaseEvent;
+import com.soze.repository.SourcedRepository;
 import com.soze.users.aggregate.User;
 import com.soze.users.commands.ChangeUserNameCommand;
 import com.soze.users.commands.CreateUserCommand;
@@ -18,10 +20,12 @@ import java.util.UUID;
 public class UserService {
 
   private final UserRepository userRepository;
+  private final SourcedRepository<User> userRepository2;
 
   @Autowired
-  public UserService(UserRepository userRepository) {
+  public UserService(UserRepository userRepository, SourcedRepository<User> userRepository2) {
     this.userRepository = userRepository;
+    this.userRepository2 = userRepository2;
   }
 
   public void createUser(CreateUserCommand command) {
@@ -67,7 +71,7 @@ public class UserService {
 
   }
 
-  public User getUser(UUID aggregateId) {
+  public User getUser(AggregateId aggregateId) {
     return userRepository.getUser(aggregateId);
   }
 

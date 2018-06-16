@@ -1,18 +1,18 @@
 package com.soze.users.commands;
 
-import java.util.UUID;
+import com.soze.aggregate.AggregateId;
 
 public class CreateUserCommand {
 
-  private final UUID userId;
+  private final AggregateId userId;
   private final String name;
 
-  public CreateUserCommand(UUID userId, String name) {
+  public CreateUserCommand(AggregateId userId, String name) {
     this.userId = userId;
     this.name = name;
   }
 
-  public UUID getUserId() {
+  public AggregateId getUserId() {
     return userId;
   }
 
