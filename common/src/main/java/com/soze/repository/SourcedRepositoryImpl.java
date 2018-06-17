@@ -19,7 +19,8 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
 
   @Autowired
   public SourcedRepositoryImpl(EventStoreService eventStoreService,
-                               EventPublisherService eventPublisherService, String exchange) {
+                               EventPublisherService eventPublisherService,
+                               String exchange) {
     this.eventStoreService = eventStoreService;
     this.eventPublisherService = eventPublisherService;
     this.exchange = exchange;
