@@ -9,13 +9,13 @@ import com.soze.events.UserNameChangedEvent;
 import com.soze.repository.SourcedRepository;
 import com.soze.service.EventStoreService;
 import com.soze.users.aggregate.User;
+import com.soze.users.commands.DeleteUserCommand;
 import com.soze.utils.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -82,11 +82,18 @@ public class UserRepository implements SourcedRepository<User> {
   }
 
   @Override
-  public User save(Class<User> clazz, AggregateId id, Command command) {
-    User user = sourcedRepository.save(clazz, id, command);
-    userNameIdMap.put(user.getName(), user.getAggregateId());
-    userIdNameMap.put(user.getAggregateId(), user.getName());
-    return sourcedRepository.save(clazz, id, command);
+  public User save(Command command) {
+    User user = sourcedRepository.save(command);
+
+    if(!(command instanceof DeleteUserCommand)) {
+      userNameIdMap.put(user.getName(), user.getAggregateId());
+      userIdNameMap.put(user.getAggregateId(), user.getName());
+    } else {
+      String name = userIdNameMap.remove(command.getAggregateId());
+      userNameIdMap.remove(name);
+    }
+
+    return user;
   }
 
   public List<User> getAllUsers() {

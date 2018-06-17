@@ -13,41 +13,44 @@ import java.util.List;
 
 public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedRepository<E> {
 
+  private final Class<E> clazz;
   private final EventStoreService eventStoreService;
   private final EventPublisherService eventPublisherService;
   private final String exchange;
 
   @Autowired
-  public SourcedRepositoryImpl(EventStoreService eventStoreService,
+  public SourcedRepositoryImpl(Class<E> clazz,
+                               EventStoreService eventStoreService,
                                EventPublisherService eventPublisherService,
                                String exchange) {
+    this.clazz = clazz;
     this.eventStoreService = eventStoreService;
     this.eventPublisherService = eventPublisherService;
     this.exchange = exchange;
   }
 
   @Override
-  public E save(Class<E> clazz, AggregateId id, Command command) {
-    E aggregate = getLatestAggregate(clazz, id);
+  public E save(Command command) {
+    E aggregate = getLatestAggregate(command.getAggregateId());
     long version = aggregate.getVersion();
     List<BaseEvent> newEvents = ReflectionUtils.processCommand(aggregate, command);
-    if (getLatestAggregateVersion(id) == version) {
+    if (getLatestAggregateVersion(command.getAggregateId()) == version) {
       publish(newEvents);
       ReflectionUtils.applyEvents(aggregate, newEvents);
     } else {
-      return save(clazz, id, command);
+      return save(command);
     }
     return aggregate;
   }
 
-  private <E> E getLatestAggregate(Class<E> clazz, AggregateId id) {
-    E aggregate = getAggregate(clazz);
+  private E getLatestAggregate(AggregateId id) {
+    E aggregate = getAggregate();
     List<BaseEvent> events = eventStoreService.getAggregateEvents(id);
     ReflectionUtils.applyEvents(aggregate, events);
     return aggregate;
   }
 
-  private <E> E getAggregate(Class<E> clazz) {
+  private E getAggregate() {
     try {
       return clazz.newInstance();
     } catch (InstantiationException e) {

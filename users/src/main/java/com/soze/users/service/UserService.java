@@ -33,7 +33,7 @@ public class UserService {
     if(userRepository.nameExists(command.getName())) {
       throw new IllegalStateException("Username already exists");
     }
-    userRepository.save(User.class, command.getAggregateId(), command);
+    userRepository.save(command);
   }
 
   public void deleteUser(DeleteUserCommand command) {
@@ -41,7 +41,7 @@ public class UserService {
     if(!userRepository.aggregateIdExists(command.getAggregateId())) {
       throw new IllegalStateException("User with id " + command.getAggregateId() + " does not exist");
     }
-    userRepository.save(User.class, command.getAggregateId(), command);
+    userRepository.save(command);
   }
 
   public void changeUserName(ChangeUserNameCommand command) {
@@ -51,7 +51,7 @@ public class UserService {
     if(userRepository.nameExists(command.getName())) {
       throw new IllegalStateException("User with name " + command.getName() + " already exists");
     }
-    userRepository.save(User.class, command.getAggregateId(), command);
+    userRepository.save(command);
   }
 
   public User getUser(AggregateId aggregateId) {

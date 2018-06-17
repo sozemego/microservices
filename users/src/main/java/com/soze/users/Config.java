@@ -6,21 +6,15 @@ import com.soze.service.EventPublisherService;
 import com.soze.service.EventStoreService;
 import com.soze.users.aggregate.User;
 import org.springframework.amqp.core.*;
-import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistrar;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.handler.annotation.support.DefaultMessageHandlerMethodFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
 public class Config implements WebMvcConfigurer {
@@ -73,7 +67,7 @@ public class Config implements WebMvcConfigurer {
   @Bean(name = "SourcedRepositoryImpl")
   SourcedRepository<User> userSourcedRepository(EventStoreService eventStoreService,
                                                 EventPublisherService eventPublisherService) {
-    return new SourcedRepositoryImpl<>(eventStoreService, eventPublisherService, EXCHANGE);
+    return new SourcedRepositoryImpl<>(User.class, eventStoreService, eventPublisherService, EXCHANGE);
   }
 
 }
