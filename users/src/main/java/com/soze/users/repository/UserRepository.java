@@ -100,11 +100,11 @@ public class UserRepository implements SourcedRepository<User> {
     return userIdNameMap
              .keySet()
              .stream()
-             .map(this::getUser)
+             .map(this::get)
              .collect(Collectors.toList());
   }
 
-  public User getUser(AggregateId aggregateId) {
+  public User get(AggregateId aggregateId) {
     List<BaseEvent> events = eventStoreService.getAggregateEvents(aggregateId);
     User user = new User();
     for (BaseEvent event : events) {

@@ -30,8 +30,16 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
   }
 
   @Override
+  public E get(AggregateId aggregateId) {
+    E aggregate = getAggregate();
+    List<BaseEvent> events = eventStoreService.getAggregateEvents(aggregateId);
+    ReflectionUtils.applyEvents(aggregate, events);
+    return aggregate;
+  }
+
+  @Override
   public E save(Command command) {
-    E aggregate = getLatestAggregate(command.getAggregateId());
+    E aggregate = get(command.getAggregateId());
     long version = aggregate.getVersion();
     List<BaseEvent> newEvents = ReflectionUtils.processCommand(aggregate, command);
     if (getLatestAggregateVersion(command.getAggregateId()) == version) {
@@ -40,13 +48,6 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
     } else {
       return save(command);
     }
-    return aggregate;
-  }
-
-  private E getLatestAggregate(AggregateId id) {
-    E aggregate = getAggregate();
-    List<BaseEvent> events = eventStoreService.getAggregateEvents(id);
-    ReflectionUtils.applyEvents(aggregate, events);
     return aggregate;
   }
 

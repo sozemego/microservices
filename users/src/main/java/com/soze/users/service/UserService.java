@@ -55,7 +55,7 @@ public class UserService {
   }
 
   public User getUser(AggregateId aggregateId) {
-    return userRepository.getUser(aggregateId);
+    return userRepository.get(aggregateId);
   }
 
   public List<User> getAllUsers() {
