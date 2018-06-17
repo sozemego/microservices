@@ -93,14 +93,7 @@ public class UserRepository implements SourcedRepository<User> {
     return userIdNameMap
              .keySet()
              .stream()
-             .map(eventStoreService::getAggregateEvents)
-             .map(events -> {
-               final User user = new User();
-               for (BaseEvent event : events) {
-                 ReflectionUtils.applyEvent(user, event);
-               }
-               return user;
-             })
+             .map(this::getUser)
              .collect(Collectors.toList());
   }
 
