@@ -50,7 +50,7 @@ public class User implements Aggregate {
 
   public List<BaseEvent> process(CreateUserCommand command) {
     return Arrays.asList(
-      new UserCreatedEvent(command.getUserId(), OffsetDateTime.now(), getVersion() + 1, command.getName())
+      new UserCreatedEvent(command.getAggregateId(), OffsetDateTime.now(), getVersion() + 1, command.getName())
     );
   }
 

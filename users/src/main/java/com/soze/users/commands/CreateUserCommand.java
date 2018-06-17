@@ -1,8 +1,9 @@
 package com.soze.users.commands;
 
 import com.soze.aggregate.AggregateId;
+import com.soze.command.Command;
 
-public class CreateUserCommand {
+public class CreateUserCommand implements Command {
 
   private final AggregateId userId;
   private final String name;
@@ -12,7 +13,7 @@ public class CreateUserCommand {
     this.name = name;
   }
 
-  public AggregateId getUserId() {
+  public AggregateId getAggregateId() {
     return userId;
   }
 

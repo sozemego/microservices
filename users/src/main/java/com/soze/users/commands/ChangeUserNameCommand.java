@@ -1,8 +1,9 @@
 package com.soze.users.commands;
 
 import com.soze.aggregate.AggregateId;
+import com.soze.command.Command;
 
-public class ChangeUserNameCommand {
+public class ChangeUserNameCommand implements Command {
 
   private final AggregateId aggregateId;
   private final String name;

@@ -61,7 +61,7 @@ public class EventStoreService {
     final ResponseEntity<String> response = get(GET_AGGREGATE_EVENTS + aggregateId.toString() + "?latest=true", String.class, 5);
 
     List<BaseEvent> events = parseJson(response.getBody());
-    return events.isEmpty() ? -1 : events.get(0).getVersion();
+    return events.isEmpty() ? 0 : events.get(0).getVersion();
   }
 
   private List<BaseEvent> parseJson(String json) {

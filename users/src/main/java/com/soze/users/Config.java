@@ -70,7 +70,7 @@ public class Config implements WebMvcConfigurer {
     return new EventPublisherService(rabbitTemplate);
   }
 
-  @Bean
+  @Bean(name = "SourcedRepositoryImpl")
   SourcedRepository<User> userSourcedRepository(EventStoreService eventStoreService,
                                                 EventPublisherService eventPublisherService) {
     return new SourcedRepositoryImpl<>(eventStoreService, eventPublisherService, EXCHANGE);

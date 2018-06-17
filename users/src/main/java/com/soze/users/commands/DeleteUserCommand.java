@@ -1,8 +1,9 @@
 package com.soze.users.commands;
 
 import com.soze.aggregate.AggregateId;
+import com.soze.command.Command;
 
-public class DeleteUserCommand {
+public class DeleteUserCommand implements Command {
 
   private final AggregateId aggregateId;
 
