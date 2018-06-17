@@ -2,6 +2,7 @@ package com.soze.eventstore;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.soze.aggregate.AggregateId;
 import com.soze.events.BaseEvent;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,8 +16,6 @@ import org.springframework.util.StreamUtils;
 import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
@@ -40,7 +39,7 @@ public class EventStore {
     return new ArrayList<>(events);
   }
 
-  public List<BaseEvent> getAggregateEvents(UUID aggregateId, boolean latest) {
+  public List<BaseEvent> getAggregateEvents(AggregateId aggregateId, boolean latest) {
     final List<BaseEvent> events = getAggregateEvents(aggregateId);
     if(events.isEmpty()) {
       return events;
@@ -49,7 +48,7 @@ public class EventStore {
     return latest ? Arrays.asList(events.get(events.size() - 1)) : events;
   }
 
-  private List<BaseEvent> getAggregateEvents(UUID aggregateId) {
+  private List<BaseEvent> getAggregateEvents(AggregateId aggregateId) {
     return events
              .stream()
              .filter(baseEvent -> baseEvent.getAggregateId().equals(aggregateId))

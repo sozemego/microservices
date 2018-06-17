@@ -1,5 +1,6 @@
 package com.soze.eventstore.rest;
 
+import com.soze.aggregate.AggregateId;
 import com.soze.events.BaseEvent;
 import com.soze.eventstore.EventStore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.soze.events.BaseEvent.*;
@@ -30,6 +28,7 @@ public class EventStoreController {
 
   @GetMapping("/")
   public ResponseEntity getAllEvents() {
+    System.out.println("GETTING ALL EVENTS");
     final List<BaseEvent> aggregateEvents = eventStore.getAllEvents();
     return ResponseEntity.ok(aggregateEvents);
   }
@@ -37,13 +36,17 @@ public class EventStoreController {
   @GetMapping("/aggregate/{aggregateId}")
   public ResponseEntity getAggregateEvents(@PathVariable("aggregateId") String aggregateId,
                                            @RequestParam(defaultValue = "false") boolean latest) {
-    final List<BaseEvent> aggregateEvents = eventStore.getAggregateEvents(UUID.fromString(aggregateId), latest);
+    System.out.println("GETTING EVENTS FOR AGGREGATE " + aggregateId + ". Latest: " + latest);
+    final List<BaseEvent> aggregateEvents = eventStore.getAggregateEvents(AggregateId.fromString(aggregateId), latest);
+    System.out.println("FOUND " + aggregateEvents + " FOR AGGREGATE ID" + aggregateId);
     return ResponseEntity.ok(aggregateEvents);
   }
 
   @GetMapping("/type")
   public ResponseEntity getEventsByType(@RequestParam("type") List<String> types) {
+    System.out.println("GETTING EVENTS FOR GIVEN TYPES: " + types);
     final List<BaseEvent> aggregateEvents = eventStore.getAggregateEvents(fromStrings(types));
+    System.out.println("FOUND " + aggregateEvents + " events");
     return ResponseEntity.ok(aggregateEvents);
   }
 

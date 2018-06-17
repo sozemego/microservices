@@ -1,8 +1,11 @@
 package com.soze.aggregate;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.io.Serializable;
 import java.util.UUID;
 
+@JsonSerialize(using = AggregateIdSerializer.class)
 public interface AggregateId extends Serializable {
 
   static AggregateId create() {
@@ -14,6 +17,5 @@ public interface AggregateId extends Serializable {
   }
 
   String toString();
-
 
 }

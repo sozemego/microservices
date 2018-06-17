@@ -1,5 +1,7 @@
 package com.soze;
 
+import com.soze.aggregate.AggregateIdDeserializer;
+import com.soze.aggregate.AggregateIdSerializer;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,8 +11,13 @@ import org.springframework.web.client.RestTemplate;
 public class Config {
 
   @Bean
-  public RestTemplate restTemplate(RestTemplateBuilder builder) {
-    return builder.build();
+  AggregateIdSerializer aggregateIdSerializer() {
+    return new AggregateIdSerializer();
+  }
+
+  @Bean
+  AggregateIdDeserializer aggregateIdDeserializer() {
+    return new AggregateIdDeserializer();
   }
 
 }
