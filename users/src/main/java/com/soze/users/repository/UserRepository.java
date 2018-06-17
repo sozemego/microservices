@@ -96,7 +96,6 @@ public class UserRepository {
   }
 
   public boolean nameExists(String name) {
-    System.out.println(userNameIdMap);
     return userNameIdMap.containsKey(name);
   }
 
