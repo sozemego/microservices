@@ -2,6 +2,7 @@ package com.soze.events;
 
 import com.fasterxml.jackson.annotation.*;
 import com.soze.aggregate.AggregateId;
+import com.soze.events.item.ItemCreatedEvent;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
@@ -18,7 +19,8 @@ import java.util.UUID;
 @JsonSubTypes({
   @JsonSubTypes.Type(value = UserCreatedEvent.class, name = "USER_CREATED"),
   @JsonSubTypes.Type(value = UserDeletedEvent.class, name = "USER_DELETED"),
-  @JsonSubTypes.Type(value = UserNameChangedEvent.class, name = "USER_NAME_CHANGED")
+  @JsonSubTypes.Type(value = UserNameChangedEvent.class, name = "USER_NAME_CHANGED"),
+  @JsonSubTypes.Type(value = ItemCreatedEvent.class, name = "ITEM_CREATED")
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class BaseEvent implements Serializable {
@@ -67,7 +69,8 @@ public abstract class BaseEvent implements Serializable {
   public abstract EventType getType();
 
   public enum EventType {
-    USER_CREATED, USER_DELETED, USER_NAME_CHANGED
+    USER_CREATED, USER_DELETED, USER_NAME_CHANGED,
+    ITEM_CREATED
   }
 
   @Override

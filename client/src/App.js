@@ -3,6 +3,7 @@ import './App.css';
 import { Tab, Tabs } from "@material-ui/core/es/index";
 import { Users } from "./Users";
 import { Events } from "./Events";
+import {Items} from "./Items";
 
 class App extends Component {
 
@@ -24,6 +25,7 @@ class App extends Component {
           <Tab label={"Events"}/>
         </Tabs>
         {this.state.value === 0 && <Users />}
+        {this.state.value === 1 && <Items />}
         {this.state.value === 3 && <Events />}
       </div>
     );

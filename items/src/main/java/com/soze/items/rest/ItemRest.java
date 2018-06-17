@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -33,8 +34,9 @@ public class ItemRest {
   }
 
   @PostMapping("/add")
-  public ResponseEntity addItem(ItemDto itemDto) {
-    Item item = itemService.addItem(new CreateItemCommand(AggregateId.create(), itemDto.getName(), BigDecimal.valueOf(itemDto.getPrice())));
+  public ResponseEntity addItem(@RequestBody CreateItemRequest createItemRequest) {
+    System.out.println(createItemRequest);
+    Item item = itemService.addItem(new CreateItemCommand(AggregateId.create(), createItemRequest.getName(), BigDecimal.valueOf(createItemRequest.getPrice())));
     return ResponseEntity.ok(convert(item));
   }
 
