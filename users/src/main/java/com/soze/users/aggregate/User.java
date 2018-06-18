@@ -55,6 +55,9 @@ public class User implements Aggregate {
   }
 
   public List<BaseEvent> process(DeleteUserCommand command) {
+    if(isDeleted()) {
+      throw new IllegalStateException(aggregateId + " is already deleted");
+    }
     return Arrays.asList(
       new UserDeletedEvent(command.getAggregateId(), OffsetDateTime.now(), getVersion() + 1)
     );

@@ -33,6 +33,7 @@ public class ReflectionUtils {
       e.printStackTrace();
     } catch (InvocationTargetException e) {
       e.printStackTrace();
+      throw new RuntimeException(e);
     }
     return new ArrayList<>();
   }
@@ -44,6 +45,7 @@ public class ReflectionUtils {
       e.printStackTrace();
     } catch (InvocationTargetException e) {
       e.printStackTrace();
+      throw new RuntimeException(e);
     }
   }
 

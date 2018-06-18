@@ -1,6 +1,7 @@
 package com.soze.users.service;
 
 import com.soze.common.aggregate.AggregateId;
+import com.soze.common.events.BaseEvent;
 import com.soze.common.repository.SourcedRepository;
 import com.soze.common.service.EventStoreService;
 import com.soze.common.utils.ReflectionUtils;
@@ -41,7 +42,10 @@ public class UserService {
       EventType.USER_NAME_CHANGED
     );
 
-    userRepository.replay(eventStoreService.getEvents(eventTypes));
+    System.out.println("INITIALIZING USER SERVICE");
+    List<BaseEvent> events = eventStoreService.getEvents(eventTypes);
+    System.out.println("REPLAYING " + events.size() + " events");
+    userRepository.replay(events);
   }
 
   public void createUser(CreateUserCommand command) {

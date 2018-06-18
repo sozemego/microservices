@@ -21,6 +21,8 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
   private final String exchange;
   private final Map<AggregateId, E> aggregates = new ConcurrentHashMap<>();
 
+  private final Map<AggregateId, Object> locks = new ConcurrentHashMap<>();
+
   @Autowired
   public SourcedRepositoryImpl(Class<E> clazz,
                                EventStoreService eventStoreService,
@@ -34,25 +36,28 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
 
   @Override
   public E get(AggregateId aggregateId) {
-    aggregates.putIfAbsent(aggregateId, getAggregateInstance());
-    return aggregates.get(aggregateId);
+    return aggregates.computeIfAbsent(aggregateId, (v) -> getAggregateInstance());
   }
 
   @Override
   public E save(Command command) {
-    E aggregate = get(command.getAggregateId());
-    long version = aggregate.getVersion();
-    List<BaseEvent> newEvents = ReflectionUtils.processCommand(aggregate, command);
+    synchronized (getLock(command.getAggregateId())) {
 
-    if (isVersionCurrent(command.getAggregateId(), version)) {
-      publish(newEvents);
-      ReflectionUtils.applyEvents(aggregate, newEvents);
-    } else {
-      update(command.getAggregateId());
-      return save(command);
+      E aggregate = get(command.getAggregateId());
+      long version = aggregate.getVersion();
+      List<BaseEvent> newEvents = ReflectionUtils.processCommand(aggregate, command);
+
+      if (isVersionCurrent(command.getAggregateId(), version)) {
+        publish(newEvents);
+        ReflectionUtils.applyEvents(aggregate, newEvents);
+      } else {
+        update(command.getAggregateId());
+        return save(command);
+      }
+
+      return aggregate;
+
     }
-    updateCache(aggregate);
-    return aggregate;
   }
 
   private boolean isVersionCurrent(AggregateId aggregateId, long version) {
@@ -69,38 +74,21 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
     return aggregates.containsKey(aggregateId);
   }
 
+  public void apply(BaseEvent event) {
+    E aggregate = get(event.getAggregateId());
+    ReflectionUtils.applyEvent(aggregate, event);
+  }
+
   @Override
   public void replay(final List<BaseEvent> events) {
-    Map<AggregateId, List<BaseEvent>> map = events
-                                              .stream()
-                                              .collect(Collectors.groupingBy(BaseEvent::getAggregateId));
-
-    map
-      .keySet()
-      .stream()
-      .forEach(id -> {
-        List<BaseEvent> aggregateEvents = map.get(id);
-        aggregateEvents.sort(Comparator.comparingLong(BaseEvent::getVersion));
-        E aggregate = getAggregateInstance();
-        ReflectionUtils.applyEvents(aggregate, aggregateEvents);
-        aggregates.put(id, aggregate);
-      });
+    aggregates.clear();
+    events.forEach(event -> apply(event));
   }
-
-  private void updateCache(final E aggregate) {
-    if(aggregate.isDeleted()) {
-      aggregates.remove(aggregate.getAggregateId());
-    } else {
-      aggregates.put(aggregate.getAggregateId(), aggregate);
-    }
-  }
-
 
   private void update(AggregateId aggregateId) {
+    aggregates.remove(aggregateId);
     List<BaseEvent> events = eventStoreService.getAggregateEvents(aggregateId);
-    E aggregate = getAggregateInstance();
-    ReflectionUtils.applyEvents(aggregate, events);
-    aggregates.put(aggregateId, aggregate);
+    events.forEach(event -> apply(event));
   }
 
   private E getAggregateInstance() {
@@ -120,5 +108,9 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
 
   private void publish(List<BaseEvent> events) {
     eventPublisherService.sendEvents(exchange, "", events);
+  }
+
+  private Object getLock(AggregateId aggregateId) {
+    return locks.computeIfAbsent(aggregateId, (v) -> new Object());
   }
 }
