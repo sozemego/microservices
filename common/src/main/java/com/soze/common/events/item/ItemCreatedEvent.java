@@ -1,8 +1,8 @@
-package com.soze.events.item;
+package com.soze.common.events.item;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.soze.aggregate.AggregateId;
-import com.soze.events.BaseEvent;
+import com.soze.common.aggregate.AggregateId;
+import com.soze.common.events.BaseEvent;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;

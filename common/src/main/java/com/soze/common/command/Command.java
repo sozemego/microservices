@@ -1,6 +1,6 @@
-package com.soze.command;
+package com.soze.common.command;
 
-import com.soze.aggregate.AggregateId;
+import com.soze.common.aggregate.AggregateId;
 
 /**
  * Marker interface.

@@ -1,19 +1,18 @@
 package com.soze.users;
 
-import com.soze.repository.SourcedRepository;
-import com.soze.repository.SourcedRepositoryImpl;
-import com.soze.service.EventPublisherService;
-import com.soze.service.EventPublisherServiceImpl;
-import com.soze.service.EventStoreService;
-import com.soze.service.EventStoreServiceImpl;
+import com.soze.common.repository.SourcedRepository;
+import com.soze.common.repository.SourcedRepositoryImpl;
+import com.soze.common.service.*;
 import com.soze.users.aggregate.User;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -62,12 +61,20 @@ public class Config implements WebMvcConfigurer {
   }
 
   @Bean
+  @Profile("!integration")
   EventPublisherService eventPublisherService(RabbitTemplate rabbitTemplate) {
     return new EventPublisherServiceImpl(rabbitTemplate);
   }
 
+  @Bean
+  @Profile("integration")
+  EventPublisherService eventPublisherServiceFake() {
+    return new EventPublisherServiceFake();
+  }
+
+  @Qualifier("SourcedRepositoryImpl")
   @Bean(name = "SourcedRepositoryImpl")
-  SourcedRepository<User> userSourcedRepository(EventStoreService eventStoreService,
+  SourcedRepository<User> sourcedRepository(EventStoreService eventStoreService,
                                                 EventPublisherService eventPublisherService) {
     return new SourcedRepositoryImpl<>(User.class, eventStoreService, eventPublisherService, EXCHANGE);
   }

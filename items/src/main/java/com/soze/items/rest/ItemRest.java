@@ -1,7 +1,7 @@
 package com.soze.items.rest;
 
 
-import com.soze.aggregate.AggregateId;
+import com.soze.common.aggregate.AggregateId;
 import com.soze.items.aggregate.Item;
 import com.soze.items.command.CreateItemCommand;
 import com.soze.items.dto.ItemDto;

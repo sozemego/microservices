@@ -1,7 +1,7 @@
 package com.soze.items.command;
 
-import com.soze.aggregate.AggregateId;
-import com.soze.command.Command;
+import com.soze.common.aggregate.AggregateId;
+import com.soze.common.command.Command;
 
 import java.math.BigDecimal;
 

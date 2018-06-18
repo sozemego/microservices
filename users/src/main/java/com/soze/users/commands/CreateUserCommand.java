@@ -1,7 +1,7 @@
 package com.soze.users.commands;
 
-import com.soze.aggregate.AggregateId;
-import com.soze.command.Command;
+import com.soze.common.aggregate.AggregateId;
+import com.soze.common.command.Command;
 
 public class CreateUserCommand implements Command {
 

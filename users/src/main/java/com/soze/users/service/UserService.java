@@ -1,6 +1,6 @@
 package com.soze.users.service;
 
-import com.soze.aggregate.AggregateId;
+import com.soze.common.aggregate.AggregateId;
 import com.soze.users.aggregate.User;
 import com.soze.users.commands.ChangeUserNameCommand;
 import com.soze.users.commands.CreateUserCommand;

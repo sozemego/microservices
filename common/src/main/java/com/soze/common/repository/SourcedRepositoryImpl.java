@@ -1,12 +1,12 @@
-package com.soze.repository;
+package com.soze.common.repository;
 
-import com.soze.aggregate.Aggregate;
-import com.soze.aggregate.AggregateId;
-import com.soze.command.Command;
-import com.soze.events.BaseEvent;
-import com.soze.service.EventPublisherService;
-import com.soze.service.EventStoreService;
-import com.soze.utils.ReflectionUtils;
+import com.soze.common.aggregate.Aggregate;
+import com.soze.common.aggregate.AggregateId;
+import com.soze.common.command.Command;
+import com.soze.common.events.BaseEvent;
+import com.soze.common.service.EventPublisherService;
+import com.soze.common.service.EventStoreService;
+import com.soze.common.utils.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;

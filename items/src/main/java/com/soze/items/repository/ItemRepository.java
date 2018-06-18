@@ -1,10 +1,10 @@
 package com.soze.items.repository;
 
-import com.soze.aggregate.AggregateId;
-import com.soze.command.Command;
+import com.soze.common.aggregate.AggregateId;
+import com.soze.common.command.Command;
 import com.soze.items.aggregate.Item;
-import com.soze.repository.SourcedRepository;
-import com.soze.service.EventStoreService;
+import com.soze.common.repository.SourcedRepository;
+import com.soze.common.service.EventStoreService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 

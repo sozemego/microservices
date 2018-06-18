@@ -1,7 +1,7 @@
 package com.soze.eventstore.rest;
 
-import com.soze.aggregate.AggregateId;
-import com.soze.events.BaseEvent;
+import com.soze.common.aggregate.AggregateId;
+import com.soze.common.events.BaseEvent;
 import com.soze.eventstore.EventStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.soze.events.BaseEvent.*;
+import static com.soze.common.events.BaseEvent.*;
 
 
 @Controller

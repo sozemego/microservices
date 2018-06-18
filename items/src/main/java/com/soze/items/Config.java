@@ -1,12 +1,12 @@
 package com.soze.items;
 
 import com.soze.items.aggregate.Item;
-import com.soze.repository.SourcedRepository;
-import com.soze.repository.SourcedRepositoryImpl;
-import com.soze.service.EventPublisherService;
-import com.soze.service.EventPublisherServiceImpl;
-import com.soze.service.EventStoreService;
-import com.soze.service.EventStoreServiceImpl;
+import com.soze.common.repository.SourcedRepository;
+import com.soze.common.repository.SourcedRepositoryImpl;
+import com.soze.common.service.EventPublisherService;
+import com.soze.common.service.EventPublisherServiceImpl;
+import com.soze.common.service.EventStoreService;
+import com.soze.common.service.EventStoreServiceImpl;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;

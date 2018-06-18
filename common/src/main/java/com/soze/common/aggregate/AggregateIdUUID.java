@@ -1,6 +1,4 @@
-package com.soze.aggregate;
-
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
+package com.soze.common.aggregate;
 
 import java.util.Objects;
 import java.util.UUID;

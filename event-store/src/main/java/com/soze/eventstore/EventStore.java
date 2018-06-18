@@ -2,8 +2,8 @@ package com.soze.eventstore;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.soze.aggregate.AggregateId;
-import com.soze.events.BaseEvent;
+import com.soze.common.aggregate.AggregateId;
+import com.soze.common.events.BaseEvent;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
-import static com.soze.events.BaseEvent.*;
+import static com.soze.common.events.BaseEvent.*;
 
 @Service
 public class EventStore {

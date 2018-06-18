@@ -1,16 +1,16 @@
 package com.soze.users.repository;
 
-import com.soze.aggregate.AggregateId;
-import com.soze.command.Command;
-import com.soze.events.BaseEvent;
-import com.soze.events.UserCreatedEvent;
-import com.soze.events.UserDeletedEvent;
-import com.soze.events.UserNameChangedEvent;
-import com.soze.repository.SourcedRepository;
-import com.soze.service.EventStoreService;
+import com.soze.common.aggregate.AggregateId;
+import com.soze.common.command.Command;
+import com.soze.common.events.BaseEvent;
+import com.soze.common.events.UserCreatedEvent;
+import com.soze.common.events.UserDeletedEvent;
+import com.soze.common.events.UserNameChangedEvent;
+import com.soze.common.repository.SourcedRepository;
+import com.soze.common.service.EventStoreService;
 import com.soze.users.aggregate.User;
 import com.soze.users.commands.DeleteUserCommand;
-import com.soze.utils.ReflectionUtils;
+import com.soze.common.utils.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static com.soze.events.BaseEvent.*;
+import static com.soze.common.events.BaseEvent.*;
 
 @Repository
 public class UserRepositoryImpl implements SourcedRepository<User>, UserRepository {

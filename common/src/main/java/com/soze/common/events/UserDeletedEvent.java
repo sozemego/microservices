@@ -1,7 +1,7 @@
-package com.soze.events;
+package com.soze.common.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.soze.aggregate.AggregateId;
+import com.soze.common.aggregate.AggregateId;
 
 import java.time.OffsetDateTime;
 import java.util.Map;

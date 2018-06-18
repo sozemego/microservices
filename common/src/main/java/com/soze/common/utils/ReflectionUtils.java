@@ -1,7 +1,7 @@
-package com.soze.utils;
+package com.soze.common.utils;
 
-import com.soze.aggregate.Aggregate;
-import com.soze.events.BaseEvent;
+import com.soze.common.aggregate.Aggregate;
+import com.soze.common.events.BaseEvent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

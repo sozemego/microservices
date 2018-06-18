@@ -1,8 +1,8 @@
-package com.soze.events;
+package com.soze.common.events;
 
 import com.fasterxml.jackson.annotation.*;
-import com.soze.aggregate.AggregateId;
-import com.soze.events.item.ItemCreatedEvent;
+import com.soze.common.aggregate.AggregateId;
+import com.soze.common.events.item.ItemCreatedEvent;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;

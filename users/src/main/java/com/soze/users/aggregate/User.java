@@ -1,11 +1,11 @@
 package com.soze.users.aggregate;
 
-import com.soze.aggregate.Aggregate;
-import com.soze.aggregate.AggregateId;
-import com.soze.events.BaseEvent;
-import com.soze.events.UserCreatedEvent;
-import com.soze.events.UserDeletedEvent;
-import com.soze.events.UserNameChangedEvent;
+import com.soze.common.aggregate.Aggregate;
+import com.soze.common.aggregate.AggregateId;
+import com.soze.common.events.BaseEvent;
+import com.soze.common.events.UserCreatedEvent;
+import com.soze.common.events.UserDeletedEvent;
+import com.soze.common.events.UserNameChangedEvent;
 import com.soze.users.commands.ChangeUserNameCommand;
 import com.soze.users.commands.CreateUserCommand;
 import com.soze.users.commands.DeleteUserCommand;

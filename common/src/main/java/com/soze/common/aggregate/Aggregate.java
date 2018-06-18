@@ -1,4 +1,4 @@
-package com.soze.aggregate;
+package com.soze.common.aggregate;
 
 public interface Aggregate {
 

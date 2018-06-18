@@ -1,7 +1,7 @@
-package com.soze.service;
+package com.soze.common.service;
 
-import com.soze.aggregate.AggregateId;
-import com.soze.events.BaseEvent;
+import com.soze.common.aggregate.AggregateId;
+import com.soze.common.events.BaseEvent;
 
 import java.util.List;
 

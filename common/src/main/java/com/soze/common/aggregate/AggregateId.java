@@ -1,4 +1,4 @@
-package com.soze.aggregate;
+package com.soze.common.aggregate;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 

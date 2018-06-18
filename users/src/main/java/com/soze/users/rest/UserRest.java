@@ -1,6 +1,6 @@
 package com.soze.users.rest;
 
-import com.soze.aggregate.AggregateId;
+import com.soze.common.aggregate.AggregateId;
 import com.soze.users.commands.ChangeUserNameCommand;
 import com.soze.users.commands.CreateUserCommand;
 import com.soze.users.commands.DeleteUserCommand;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @Controller
 public class UserRest {

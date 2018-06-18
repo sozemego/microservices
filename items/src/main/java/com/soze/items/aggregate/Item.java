@@ -1,9 +1,9 @@
 package com.soze.items.aggregate;
 
-import com.soze.aggregate.Aggregate;
-import com.soze.aggregate.AggregateId;
-import com.soze.events.BaseEvent;
-import com.soze.events.item.ItemCreatedEvent;
+import com.soze.common.aggregate.Aggregate;
+import com.soze.common.aggregate.AggregateId;
+import com.soze.common.events.BaseEvent;
+import com.soze.common.events.item.ItemCreatedEvent;
 import com.soze.items.command.CreateItemCommand;
 
 import java.math.BigDecimal;

@@ -1,7 +1,7 @@
 package com.soze.users.repository;
 
-import com.soze.aggregate.AggregateId;
-import com.soze.command.Command;
+import com.soze.common.aggregate.AggregateId;
+import com.soze.common.command.Command;
 import com.soze.users.aggregate.User;
 
 import java.util.List;

@@ -1,9 +1,9 @@
-package com.soze.service;
+package com.soze.common.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.soze.aggregate.AggregateId;
-import com.soze.events.BaseEvent;
-import com.soze.events.BaseEvent.EventType;
+import com.soze.common.aggregate.AggregateId;
+import com.soze.common.events.BaseEvent;
+import com.soze.common.events.BaseEvent.EventType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;

@@ -1,11 +1,10 @@
-package com.soze;
+package com.soze.common;
 
-import com.soze.aggregate.AggregateIdDeserializer;
-import com.soze.aggregate.AggregateIdSerializer;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import com.soze.common.aggregate.AggregateIdDeserializer;
+import com.soze.common.aggregate.AggregateIdSerializer;
+import com.soze.common.service.EventPublisherServiceFake;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class Config {
@@ -18,6 +17,11 @@ public class Config {
   @Bean
   AggregateIdDeserializer aggregateIdDeserializer() {
     return new AggregateIdDeserializer();
+  }
+
+  @Bean
+  EventPublisherServiceFake eventPublisherServiceFake() {
+    return new EventPublisherServiceFake();
   }
 
 }

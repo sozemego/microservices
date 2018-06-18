@@ -1,10 +1,10 @@
 package com.soze.items.service;
 
-import com.soze.aggregate.AggregateId;
+import com.soze.common.aggregate.AggregateId;
 import com.soze.items.aggregate.Item;
 import com.soze.items.command.CreateItemCommand;
-import com.soze.repository.SourcedRepository;
-import com.soze.service.EventStoreService;
+import com.soze.common.repository.SourcedRepository;
+import com.soze.common.service.EventStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +12,7 @@ import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.soze.events.BaseEvent.*;
+import static com.soze.common.events.BaseEvent.*;
 
 @Service
 public class ItemService {
