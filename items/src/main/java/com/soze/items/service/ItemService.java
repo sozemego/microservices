@@ -33,11 +33,7 @@ public class ItemService {
       EventType.ITEM_CREATED
     );
 
-    eventStoreService
-      .getEvents(eventTypes)
-      .stream()
-      .peek(event -> System.out.println(event))
-      .forEach(event -> allAggregates.add(event.getAggregateId()));
+    itemRepository.replay(eventStoreService.getEvents(eventTypes));
   }
 
   public List<Item> getAllItems() {
