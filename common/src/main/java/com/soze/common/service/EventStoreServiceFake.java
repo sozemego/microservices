@@ -44,4 +44,9 @@ public class EventStoreServiceFake implements EventStoreService {
   public long getAggregateVersion(final AggregateId aggregateId) {
     return events.getOrDefault(aggregateId, new ArrayList<>()).size();
   }
+
+  public void addEvent(AggregateId aggregateId, BaseEvent event) {
+    events.putIfAbsent(aggregateId, new ArrayList<>());
+    events.get(aggregateId).add(event);
+  }
 }
