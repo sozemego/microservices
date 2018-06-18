@@ -1,22 +1,15 @@
 package com.soze.users.service;
 
 import com.soze.aggregate.AggregateId;
-import com.soze.events.BaseEvent;
-import com.soze.repository.SourcedRepository;
 import com.soze.users.aggregate.User;
 import com.soze.users.commands.ChangeUserNameCommand;
 import com.soze.users.commands.CreateUserCommand;
 import com.soze.users.commands.DeleteUserCommand;
 import com.soze.users.repository.UserRepository;
-import com.soze.utils.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
 
 @Service
 public class UserService {
