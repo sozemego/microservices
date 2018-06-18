@@ -5,12 +5,12 @@ import com.soze.common.aggregate.AggregateId;
 public class InvalidAggregateVersion extends RuntimeException {
 
   private final AggregateId aggregateId;
-  private final long updatedVersion;
+  private final long commandVersion;
   private final long realVersion;
 
   public InvalidAggregateVersion(AggregateId aggregateId, long updatedVersion, long realVersion) {
     this.aggregateId = aggregateId;
-    this.updatedVersion = updatedVersion;
+    this.commandVersion = updatedVersion;
     this.realVersion = realVersion;
   }
 
@@ -18,8 +18,8 @@ public class InvalidAggregateVersion extends RuntimeException {
     return aggregateId;
   }
 
-  public long getUpdatedVersion() {
-    return updatedVersion;
+  public long getCommandVersion() {
+    return commandVersion;
   }
 
   public long getRealVersion() {
@@ -28,6 +28,6 @@ public class InvalidAggregateVersion extends RuntimeException {
 
   @Override
   public String getMessage() {
-    return aggregateId + " could not be updated because it had version " + updatedVersion + " while the real version was " + realVersion;
+    return aggregateId + " could not be updated because the command had version " + commandVersion + " while the aggregate version was " + realVersion;
   }
 }

@@ -37,29 +37,30 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
 
   @Override
   public E get(AggregateId aggregateId) {
-    return aggregates.computeIfAbsent(aggregateId, (v) -> getAggregateInstance());
+    return aggregates.computeIfAbsent(aggregateId, (id) -> getAggregateInstance());
   }
 
   @Override
   public E save(Command command) {
-    synchronized (getLock(command.getAggregateId())) {
+//    synchronized (getLock(command.getAggregateId())) {
 
-      E aggregate = get(command.getAggregateId());
-      long version = aggregate.getVersion();
-      List<BaseEvent> newEvents = ReflectionUtils.processCommand(aggregate, command);
+    E aggregate = get(command.getAggregateId());
+    long commandVersion = command.getAggregateVersion();
+    long realVersion = aggregate.getVersion();
 
-      long realVersion = getLatestAggregateVersion(aggregate.getAggregateId());
-      if (version != realVersion) {
-        update(command.getAggregateId());
-        throw new InvalidAggregateVersion(aggregate.getAggregateId(), version, realVersion);
-      }
-
-      publish(newEvents);
-      ReflectionUtils.applyEvents(aggregate, newEvents);
-
-      return aggregate;
-
+    if (commandVersion != realVersion) {
+      update(command.getAggregateId());
+      throw new InvalidAggregateVersion(command.getAggregateId(), commandVersion, realVersion);
     }
+
+    List<BaseEvent> newEvents = ReflectionUtils.processCommand(aggregate, command);
+
+    publish(newEvents);
+    ReflectionUtils.applyEvents(aggregate, newEvents);
+
+    return aggregate;
+
+//    }
   }
 
   @Override

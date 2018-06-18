@@ -14,10 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.soze.common.events.BaseEvent.*;
@@ -27,6 +24,8 @@ public class UserService {
 
   private final SourcedRepository<User> userRepository;
   private final EventStoreService eventStoreService;
+
+  private final Set<String> usersBeingAdded = Collections.synchronizedSet(new HashSet<>());
 
   @Autowired
   public UserService(@Qualifier("SourcedRepositoryImpl") SourcedRepository userRepository,
@@ -52,8 +51,12 @@ public class UserService {
   public void createUser(CreateUserCommand command) {
     System.out.println(command);
     validateUsernameDoesNotExist(command.getName());
+    validateUsernameIsNotBeingAdded(command.getName());
+    usersBeingAdded.add(command.getName());
 
     userRepository.save(command);
+
+    usersBeingAdded.remove(command.getName());
   }
 
   public void deleteUser(DeleteUserCommand command) {
@@ -90,6 +93,12 @@ public class UserService {
       .filter(user -> username.equals(user.getName()))
       .findFirst()
       .ifPresent((user) -> new IllegalStateException("username: " + username + " already exists"));
+  }
+
+  private void validateUsernameIsNotBeingAdded(String username) {
+    if(usersBeingAdded.contains(username)) {
+      throw new IllegalStateException("username: " + username + " already exists");
+    }
   }
 
   private void validateAggregateIdExists(AggregateId aggregateId) {
