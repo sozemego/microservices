@@ -51,7 +51,6 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
       update(command.getAggregateId());
       return save(command);
     }
-
     updateCache(aggregate);
     return aggregate;
   }
