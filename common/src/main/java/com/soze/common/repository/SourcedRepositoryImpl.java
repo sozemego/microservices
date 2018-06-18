@@ -34,7 +34,8 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
 
   @Override
   public E get(AggregateId aggregateId) {
-    return aggregates.getOrDefault(aggregateId, getAggregateInstance());
+    aggregates.putIfAbsent(aggregateId, getAggregateInstance());
+    return aggregates.get(aggregateId);
   }
 
   @Override
