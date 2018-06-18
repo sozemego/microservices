@@ -56,15 +56,20 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
   }
 
   @Override
-  public List<E> getAll() {
-    return new ArrayList<>(aggregates.values());
+  public Map<AggregateId, E> getAll() {
+    return new HashMap<>(aggregates);
+  }
+
+  @Override
+  public boolean checkExists(final AggregateId aggregateId) {
+    return aggregates.containsKey(aggregateId);
   }
 
   @Override
   public void replay(final List<BaseEvent> events) {
-    final Map<AggregateId, List<BaseEvent>> map = events
-                                                    .stream()
-                                                    .collect(Collectors.groupingBy(BaseEvent::getAggregateId));
+    Map<AggregateId, List<BaseEvent>> map = events
+                                              .stream()
+                                              .collect(Collectors.groupingBy(BaseEvent::getAggregateId));
 
     map
       .keySet()
@@ -72,14 +77,16 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
       .forEach(id -> {
         List<BaseEvent> aggregateEvents = map.get(id);
         aggregateEvents.sort(Comparator.comparingLong(BaseEvent::getVersion));
-
+        E aggregate = getAggregateInstance();
+        ReflectionUtils.applyEvents(aggregate, aggregateEvents);
+        aggregates.put(id, aggregate);
       });
   }
 
   private void update(AggregateId aggregateId) {
     List<BaseEvent> events = eventStoreService.getAggregateEvents(aggregateId);
     E aggregate = getAggregateInstance();
-    ReflectionUtils.applyEvent(aggregate, events);
+    ReflectionUtils.applyEvents(aggregate, events);
     aggregates.put(aggregateId, aggregate);
   }
 
