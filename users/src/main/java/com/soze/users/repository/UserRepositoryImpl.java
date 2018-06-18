@@ -2,7 +2,6 @@ package com.soze.users.repository;
 
 import com.soze.common.aggregate.AggregateId;
 import com.soze.common.command.Command;
-import com.soze.common.events.BaseEvent;
 import com.soze.common.events.UserCreatedEvent;
 import com.soze.common.events.UserDeletedEvent;
 import com.soze.common.events.UserNameChangedEvent;
@@ -102,12 +101,7 @@ public class UserRepositoryImpl implements SourcedRepository<User>, UserReposito
 
   @Override
   public User get(AggregateId aggregateId) {
-    List<BaseEvent> events = eventStoreService.getAggregateEvents(aggregateId);
-    User user = new User();
-    for (BaseEvent event : events) {
-      ReflectionUtils.applyEvent(user, event);
-    }
-    return user;
+    return sourcedRepository.get(aggregateId);
   }
 
 }
