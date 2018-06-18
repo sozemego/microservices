@@ -9,10 +9,9 @@ import com.soze.common.service.EventStoreService;
 import com.soze.common.utils.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedRepository<E> {
 
@@ -35,7 +34,7 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
 
   @Override
   public E get(AggregateId aggregateId) {
-    return aggregates.getOrDefault(aggregateId, getAggregate());
+    return aggregates.getOrDefault(aggregateId, getAggregateInstance());
   }
 
   @Override
@@ -43,12 +42,15 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
     E aggregate = get(command.getAggregateId());
     long version = aggregate.getVersion();
     List<BaseEvent> newEvents = ReflectionUtils.processCommand(aggregate, command);
+
     if (getLatestAggregateVersion(command.getAggregateId()) == version) {
       publish(newEvents);
       ReflectionUtils.applyEvents(aggregate, newEvents);
     } else {
+      update(command.getAggregateId());
       return save(command);
     }
+
     aggregates.put(aggregate.getAggregateId(), aggregate);
     return aggregate;
   }
@@ -58,7 +60,30 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
     return new ArrayList<>(aggregates.values());
   }
 
-  private E getAggregate() {
+  @Override
+  public void replay(final List<BaseEvent> events) {
+    final Map<AggregateId, List<BaseEvent>> map = events
+                                                    .stream()
+                                                    .collect(Collectors.groupingBy(BaseEvent::getAggregateId));
+
+    map
+      .keySet()
+      .stream()
+      .forEach(id -> {
+        List<BaseEvent> aggregateEvents = map.get(id);
+        aggregateEvents.sort(Comparator.comparingLong(BaseEvent::getVersion));
+
+      });
+  }
+
+  private void update(AggregateId aggregateId) {
+    List<BaseEvent> events = eventStoreService.getAggregateEvents(aggregateId);
+    E aggregate = getAggregateInstance();
+    ReflectionUtils.applyEvent(aggregate, events);
+    aggregates.put(aggregateId, aggregate);
+  }
+
+  private E getAggregateInstance() {
     try {
       return clazz.newInstance();
     } catch (InstantiationException e) {
