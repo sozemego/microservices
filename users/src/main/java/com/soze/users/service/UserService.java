@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.soze.common.events.BaseEvent.*;
 
@@ -73,7 +74,12 @@ public class UserService {
   }
 
   public List<User> getAllUsers() {
-    return new ArrayList<>(userRepository.getAll().values());
+    return userRepository
+             .getAll()
+             .values()
+             .stream()
+             .filter(user -> !user.isDeleted())
+             .collect(Collectors.toList());
   }
 
   private void validateUsernameDoesNotExist(String username) {
