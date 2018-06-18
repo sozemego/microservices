@@ -4,6 +4,7 @@ import com.soze.common.aggregate.Aggregate;
 import com.soze.common.aggregate.AggregateId;
 import com.soze.common.command.Command;
 import com.soze.common.events.BaseEvent;
+import com.soze.common.exception.InvalidAggregateVersion;
 import com.soze.common.service.EventPublisherService;
 import com.soze.common.service.EventStoreService;
 import com.soze.common.utils.ReflectionUtils;
@@ -47,13 +48,14 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
       long version = aggregate.getVersion();
       List<BaseEvent> newEvents = ReflectionUtils.processCommand(aggregate, command);
 
-      if (isVersionCurrent(command.getAggregateId(), version)) {
-        publish(newEvents);
-        ReflectionUtils.applyEvents(aggregate, newEvents);
-      } else {
+      long realVersion = getLatestAggregateVersion(aggregate.getAggregateId());
+      if (version != realVersion) {
         update(command.getAggregateId());
-        return save(command);
+        throw new InvalidAggregateVersion(aggregate.getAggregateId(), version, realVersion);
       }
+
+      publish(newEvents);
+      ReflectionUtils.applyEvents(aggregate, newEvents);
 
       return aggregate;
 

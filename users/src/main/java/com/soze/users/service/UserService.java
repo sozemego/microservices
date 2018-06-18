@@ -87,7 +87,7 @@ public class UserService {
       .getAll()
       .values()
       .stream()
-      .filter(user -> user.getName().equals(username))
+      .filter(user -> username.equals(user.getName()))
       .findFirst()
       .ifPresent((user) -> new IllegalStateException("username: " + username + " already exists"));
   }
