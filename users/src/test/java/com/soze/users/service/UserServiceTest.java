@@ -19,8 +19,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.time.OffsetDateTime;
-
 import static junit.framework.TestCase.assertTrue;
 
 @RunWith(SpringRunner.class)

@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import static com.soze.common.events.BaseEvent.*;
 
@@ -97,12 +96,8 @@ public class UserRepositoryImpl implements SourcedRepository<User>, UserReposito
   }
 
   @Override
-  public List<User> getAllUsers() {
-    return userIdNameMap
-             .keySet()
-             .stream()
-             .map(this::get)
-             .collect(Collectors.toList());
+  public List<User> getAll() {
+    return sourcedRepository.getAll();
   }
 
   @Override

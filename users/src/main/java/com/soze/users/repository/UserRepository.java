@@ -9,7 +9,7 @@ import java.util.List;
 public interface UserRepository {
   User save(Command command);
 
-  List<User> getAllUsers();
+  List<User> getAll();
 
   User get(AggregateId aggregateId);
 

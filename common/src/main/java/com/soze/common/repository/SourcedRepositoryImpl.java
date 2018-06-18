@@ -9,6 +9,7 @@ import com.soze.common.service.EventStoreService;
 import com.soze.common.utils.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,6 +51,11 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
     }
     aggregates.put(aggregate.getAggregateId(), aggregate);
     return aggregate;
+  }
+
+  @Override
+  public List<E> getAll() {
+    return new ArrayList<>(aggregates.values());
   }
 
   private E getAggregate() {
