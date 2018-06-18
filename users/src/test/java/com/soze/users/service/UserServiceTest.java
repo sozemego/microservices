@@ -7,6 +7,7 @@ import com.soze.common.service.EventPublisherServiceFake;
 import com.soze.common.service.EventStoreServiceFake;
 import com.soze.users.App;
 import com.soze.users.Config;
+import com.soze.users.aggregate.User;
 import com.soze.users.commands.ChangeUserNameCommand;
 import com.soze.users.commands.CreateUserCommand;
 import org.junit.Before;
@@ -44,9 +45,13 @@ public class UserServiceTest {
 
   @Test
   public void testAddUser() {
-    userService.createUser(new CreateUserCommand(AggregateId.create(), "name"));
+    AggregateId aggregateId = AggregateId.create();
+    userService.createUser(new CreateUserCommand(aggregateId, "name"));
     assertTrue(eventPublisherService.getEvents().size() == 1);
     assertTrue(eventPublisherService.getEvents().get(0) instanceof UserCreatedEvent);
+    User user = userService.getUser(aggregateId);
+    assertTrue(user.getName().equals("name"));
+    assertTrue(user.getVersion() == 1);
   }
 
   @Test
@@ -58,6 +63,9 @@ public class UserServiceTest {
     assertTrue(eventPublisherService.getEvents().size() == 2);
     assertTrue(eventPublisherService.getEvents().get(0) instanceof UserCreatedEvent);
     assertTrue(eventPublisherService.getEvents().get(1) instanceof UserNameChangedEvent);
+    User user = userService.getUser(aggregateId);
+    assertTrue(user.getName().equals("new name!"));
+    assertTrue(user.getVersion() == 2);
   }
 
 }
