@@ -10,6 +10,8 @@ import com.soze.utils.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedRepository<E> {
 
@@ -17,6 +19,7 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
   private final EventStoreService eventStoreService;
   private final EventPublisherService eventPublisherService;
   private final String exchange;
+  private final Map<AggregateId, E> aggregates = new ConcurrentHashMap<>();
 
   @Autowired
   public SourcedRepositoryImpl(Class<E> clazz,
@@ -31,10 +34,7 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
 
   @Override
   public E get(AggregateId aggregateId) {
-    E aggregate = getAggregate();
-    List<BaseEvent> events = eventStoreService.getAggregateEvents(aggregateId);
-    ReflectionUtils.applyEvents(aggregate, events);
-    return aggregate;
+    return aggregates.getOrDefault(aggregateId, getAggregate());
   }
 
   @Override
@@ -48,6 +48,7 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
     } else {
       return save(command);
     }
+    aggregates.put(aggregate.getAggregateId(), aggregate);
     return aggregate;
   }
 
