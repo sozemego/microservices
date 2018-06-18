@@ -14,6 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public class EventStoreServiceImpl implements EventStoreService {
@@ -61,6 +62,7 @@ public class EventStoreServiceImpl implements EventStoreService {
 
   @Override
   public long getAggregateVersion(AggregateId aggregateId) {
+    Objects.requireNonNull(aggregateId);
     final ResponseEntity<String> response = get(GET_AGGREGATE_EVENTS + aggregateId.toString() + "?latest=true", String.class, 5);
 
     List<BaseEvent> events = parseJson(response.getBody());
