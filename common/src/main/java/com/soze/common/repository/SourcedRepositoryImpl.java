@@ -62,10 +62,6 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
     }
   }
 
-  private boolean isVersionCurrent(AggregateId aggregateId, long version) {
-    return getLatestAggregateVersion(aggregateId) == version;
-  }
-
   @Override
   public Map<AggregateId, E> getAll() {
     return Collections.unmodifiableMap(aggregates);
@@ -74,11 +70,6 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
   @Override
   public boolean checkExists(final AggregateId aggregateId) {
     return aggregates.containsKey(aggregateId);
-  }
-
-  public void apply(BaseEvent event) {
-    E aggregate = get(event.getAggregateId());
-    ReflectionUtils.applyEvent(aggregate, event);
   }
 
   @Override
@@ -91,6 +82,11 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
     aggregates.remove(aggregateId);
     List<BaseEvent> events = eventStoreService.getAggregateEvents(aggregateId);
     events.forEach(event -> apply(event));
+  }
+
+  private void apply(BaseEvent event) {
+    E aggregate = get(event.getAggregateId());
+    ReflectionUtils.applyEvent(aggregate, event);
   }
 
   private E getAggregateInstance() {
@@ -115,4 +111,5 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
   private Object getLock(AggregateId aggregateId) {
     return locks.computeIfAbsent(aggregateId, (v) -> new Object());
   }
+
 }
