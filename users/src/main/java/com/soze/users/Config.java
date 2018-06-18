@@ -1,5 +1,7 @@
 package com.soze.users;
 
+import com.soze.common.aggregate.AggregateId;
+import com.soze.common.events.BaseEvent;
 import com.soze.common.repository.SourcedRepository;
 import com.soze.common.repository.SourcedRepositoryImpl;
 import com.soze.common.service.*;
@@ -16,6 +18,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 public class Config implements WebMvcConfigurer {
@@ -56,8 +61,15 @@ public class Config implements WebMvcConfigurer {
   }
 
   @Bean
+  @Profile("!integration")
   EventStoreService eventStoreService(RestTemplate restTemplate) {
     return new EventStoreServiceImpl(restTemplate);
+  }
+
+  @Bean
+  @Profile("integration")
+  EventStoreService eventStoreServiceFake() {
+    return new EventStoreServiceFake();
   }
 
   @Bean
