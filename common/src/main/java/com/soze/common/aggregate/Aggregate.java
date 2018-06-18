@@ -6,4 +6,6 @@ public interface Aggregate {
 
   long getVersion();
 
+  boolean isDeleted();
+
 }

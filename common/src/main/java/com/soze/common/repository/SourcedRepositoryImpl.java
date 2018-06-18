@@ -43,7 +43,7 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
     long version = aggregate.getVersion();
     List<BaseEvent> newEvents = ReflectionUtils.processCommand(aggregate, command);
 
-    if (getLatestAggregateVersion(command.getAggregateId()) == version) {
+    if (isVersionCurrent(command.getAggregateId(), version)) {
       publish(newEvents);
       ReflectionUtils.applyEvents(aggregate, newEvents);
     } else {
@@ -51,13 +51,17 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
       return save(command);
     }
 
-    aggregates.put(aggregate.getAggregateId(), aggregate);
+    updateCache(aggregate);
     return aggregate;
+  }
+
+  private boolean isVersionCurrent(AggregateId aggregateId, long version) {
+    return getLatestAggregateVersion(aggregateId) == version;
   }
 
   @Override
   public Map<AggregateId, E> getAll() {
-    return new HashMap<>(aggregates);
+    return Collections.unmodifiableMap(aggregates);
   }
 
   @Override
@@ -82,6 +86,15 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
         aggregates.put(id, aggregate);
       });
   }
+
+  private void updateCache(final E aggregate) {
+    if(aggregate.isDeleted()) {
+      aggregates.remove(aggregate.getAggregateId());
+    } else {
+      aggregates.put(aggregate.getAggregateId(), aggregate);
+    }
+  }
+
 
   private void update(AggregateId aggregateId) {
     List<BaseEvent> events = eventStoreService.getAggregateEvents(aggregateId);

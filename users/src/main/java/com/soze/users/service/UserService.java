@@ -26,7 +26,6 @@ public class UserService {
   private final SourcedRepository<User> userRepository;
   private final EventStoreService eventStoreService;
 
-
   @Autowired
   public UserService(@Qualifier("SourcedRepositoryImpl") SourcedRepository userRepository,
                      final EventStoreService eventStoreService) {
@@ -61,7 +60,7 @@ public class UserService {
   public void changeUserName(ChangeUserNameCommand command) {
     System.out.println(command);
     validateAggregateIdExists(command.getAggregateId());
-    validateUserNameExists(command.getName());
+    validateUsernameDoesNotExist(command.getName());
     userRepository.save(command);
   }
 
@@ -71,16 +70,6 @@ public class UserService {
 
   public List<User> getAllUsers() {
     return new ArrayList<>(userRepository.getAll().values());
-  }
-
-  private void validateUserNameExists(String username) {
-    userRepository
-      .getAll()
-      .values()
-      .stream()
-      .filter(user -> user.getName().equals(username))
-      .findFirst()
-      .orElseThrow(() -> new IllegalStateException("username: " + username + " does not exist"));
   }
 
   private void validateUsernameDoesNotExist(String username) {

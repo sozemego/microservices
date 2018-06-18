@@ -21,6 +21,8 @@ public class Item implements Aggregate {
 
   private BigDecimal price;
 
+  private boolean deleted;
+
   public Item() {
 
   }
@@ -41,6 +43,11 @@ public class Item implements Aggregate {
   @Override
   public long getVersion() {
     return version;
+  }
+
+  @Override
+  public boolean isDeleted() {
+    return deleted;
   }
 
   public List<BaseEvent> process(CreateItemCommand command) {
