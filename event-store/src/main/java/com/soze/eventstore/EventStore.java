@@ -30,6 +30,8 @@ public class EventStore {
   private final Queue<BaseEvent> events = new ConcurrentLinkedQueue<>();
   private final Map<AggregateId, Long> expectedVersions = new ConcurrentHashMap<>();
 
+  private final Map<AggregateId, Object> locks = new ConcurrentHashMap<>();
+
   @Value("classpath:events.json")
   private Resource eventsFile;
 
@@ -66,11 +68,13 @@ public class EventStore {
   }
 
   public void handleEvent(BaseEvent event) {
-    System.out.println(event);
-    validateEventVersion(event);
-    events.add(event);
-    expectedVersions.compute(event.getAggregateId(), (k, v) -> v + 1L);
-    System.out.println("HANDLED " + event);
+    synchronized (getLock(event.getAggregateId())) {
+      System.out.println("HANDLING STARTED " + event);
+      validateEventVersion(event);
+      events.add(event);
+      expectedVersions.compute(event.getAggregateId(), (k, v) -> v + 1L);
+      System.out.println("HANDLED " + event);
+    }
   }
 
   public void handleEvents(List<BaseEvent> events) {
@@ -126,6 +130,10 @@ public class EventStore {
       .sorted(Comparator.comparing(BaseEvent::getCreatedAt))
       .forEach(this::handleEvent);
     System.out.println("READ EVENTS");
+  }
+
+  private Object getLock(AggregateId aggregateId) {
+    return locks.computeIfAbsent(aggregateId, (k) -> new Object());
   }
 
 }
