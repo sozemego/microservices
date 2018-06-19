@@ -42,25 +42,13 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
 
   @Override
   public E save(Command command) {
-//    synchronized (getLock(command.getAggregateId())) {
-
     E aggregate = get(command.getAggregateId());
-//    long commandVersion = command.getAggregateVersion();
-//    long realVersion = aggregate.getVersion();
-//
-//    if (commandVersion != realVersion) {
-//      update(command.getAggregateId());
-//      throw new InvalidAggregateVersion(command.getAggregateId(), commandVersion, realVersion);
-//    }
-
     List<BaseEvent> newEvents = ReflectionUtils.processCommand(aggregate, command);
 
     send(newEvents);
     ReflectionUtils.applyEvents(aggregate, newEvents);
 
     return aggregate;
-
-//    }
   }
 
   @Override
@@ -76,12 +64,6 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
   @Override
   public void replay(final List<BaseEvent> events) {
     aggregates.clear();
-    events.forEach(event -> apply(event));
-  }
-
-  private void update(AggregateId aggregateId) {
-    aggregates.remove(aggregateId);
-    List<BaseEvent> events = eventStoreService.getAggregateEvents(aggregateId);
     events.forEach(event -> apply(event));
   }
 
@@ -101,17 +83,8 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
     throw new IllegalStateException(clazz.toString() + " does not have a valid constructor");
   }
 
-  private long getLatestAggregateVersion(AggregateId id) {
-    return eventStoreService.getAggregateVersion(id);
-  }
-
   private void send(List<BaseEvent> events) {
     eventStoreService.send(events);
-//    eventPublisherService.sendEvents(exchange, "", events);
-  }
-
-  private Object getLock(AggregateId aggregateId) {
-    return locks.computeIfAbsent(aggregateId, (v) -> new Object());
   }
 
 }

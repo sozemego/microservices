@@ -3,6 +3,7 @@ package com.soze.eventstore.rest;
 import com.soze.common.aggregate.AggregateId;
 import com.soze.common.events.BaseEvent;
 import com.soze.eventstore.EventStore;
+import com.soze.eventstore.InvalidEventVersion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -51,7 +52,11 @@ public class EventStoreController {
   @PostMapping("/post")
   public ResponseEntity postEvents(@RequestBody List<BaseEvent> events) {
     System.out.println("EVENTS POSTED " + events);
-    eventStore.handleEvents(events);
+    try {
+      eventStore.handleEvents(events);
+    } catch (InvalidEventVersion e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
     return ResponseEntity.ok().build();
   }
 

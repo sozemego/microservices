@@ -81,6 +81,7 @@ public class EventStore {
   private void validateEventVersion(BaseEvent event) {
     long expectedVersion = expectedVersions.computeIfAbsent(event.getAggregateId(), (v) -> 1L);
     if(expectedVersion != event.getVersion()) {
+      System.out.println("Invalid event version: " + event + " . Expected: " + expectedVersion);
       throw new InvalidEventVersion(event, expectedVersion);
     }
   }

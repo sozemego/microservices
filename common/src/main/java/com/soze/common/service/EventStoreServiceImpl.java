@@ -110,7 +110,12 @@ public class EventStoreServiceImpl implements EventStoreService {
   }
 
   private ResponseEntity post(String url, Object message) {
-    return restTemplate.postForEntity(url, message, String.class);
+    try {
+      return restTemplate.postForEntity(url, message, String.class);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
   }
 
 }
