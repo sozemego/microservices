@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.soze.common.aggregate.AggregateId;
 import com.soze.common.events.BaseEvent;
+import com.soze.common.service.EventPublisherService;
 import com.soze.eventstore.exception.InvalidEventVersion;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -27,6 +29,8 @@ import static com.soze.common.events.BaseEvent.*;
 @Service
 public class EventStore {
 
+  private final EventPublisherService eventPublisherService;
+
   private final Queue<BaseEvent> events = new ConcurrentLinkedQueue<>();
   private final Map<AggregateId, Long> expectedVersions = new ConcurrentHashMap<>();
 
@@ -34,6 +38,11 @@ public class EventStore {
 
   @Value("classpath:events.json")
   private Resource eventsFile;
+
+  @Autowired
+  public EventStore(final EventPublisherService eventPublisherService) {
+    this.eventPublisherService = eventPublisherService;
+  }
 
   @PostConstruct
   public void setup() throws Exception {
@@ -74,6 +83,7 @@ public class EventStore {
       events.add(event);
       expectedVersions.compute(event.getAggregateId(), (k, v) -> v + 1L);
       System.out.println("HANDLED " + event);
+      eventPublisherService.sendEvent(Config.EXCHANGE, "", event);
     }
   }
 

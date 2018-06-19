@@ -18,21 +18,13 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
 
   private final Class<E> clazz;
   private final EventStoreService eventStoreService;
-  private final EventPublisherService eventPublisherService;
-  private final String exchange;
   private final Map<AggregateId, E> aggregates = new ConcurrentHashMap<>();
-
-  private final Map<AggregateId, Object> locks = new ConcurrentHashMap<>();
 
   @Autowired
   public SourcedRepositoryImpl(Class<E> clazz,
-                               EventStoreService eventStoreService,
-                               EventPublisherService eventPublisherService,
-                               String exchange) {
+                               EventStoreService eventStoreService) {
     this.clazz = clazz;
     this.eventStoreService = eventStoreService;
-    this.eventPublisherService = eventPublisherService;
-    this.exchange = exchange;
   }
 
   @Override

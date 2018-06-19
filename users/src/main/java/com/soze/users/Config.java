@@ -81,9 +81,8 @@ public class Config implements WebMvcConfigurer {
 
   @Qualifier("SourcedRepositoryImpl")
   @Bean(name = "SourcedRepositoryImpl")
-  SourcedRepository<User> sourcedRepository(EventStoreService eventStoreService,
-                                                EventPublisherService eventPublisherService) {
-    return new SourcedRepositoryImpl<>(User.class, eventStoreService, eventPublisherService, EXCHANGE);
+  SourcedRepository<User> sourcedRepository(EventStoreService eventStoreService) {
+    return new SourcedRepositoryImpl<>(User.class, eventStoreService);
   }
 
 }

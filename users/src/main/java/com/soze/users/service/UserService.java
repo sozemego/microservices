@@ -1,16 +1,9 @@
 package com.soze.users.service;
 
-import com.evanlennick.retry4j.CallExecutor;
-import com.evanlennick.retry4j.Status;
-import com.evanlennick.retry4j.config.RetryConfig;
-import com.evanlennick.retry4j.config.RetryConfigBuilder;
-import com.evanlennick.retry4j.exception.RetriesExhaustedException;
 import com.soze.common.aggregate.AggregateId;
 import com.soze.common.events.BaseEvent;
-import com.soze.common.exception.InvalidEventVersion;
 import com.soze.common.repository.SourcedRepository;
 import com.soze.common.service.EventStoreService;
-import com.soze.common.utils.ReflectionUtils;
 import com.soze.users.aggregate.User;
 import com.soze.users.commands.ChangeUserNameCommand;
 import com.soze.users.commands.CreateUserCommand;
@@ -20,9 +13,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import static com.soze.common.events.BaseEvent.*;

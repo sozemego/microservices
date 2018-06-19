@@ -1,8 +1,11 @@
 package com.soze.eventstore;
 
+import com.soze.common.service.EventPublisherService;
+import com.soze.common.service.EventPublisherServiceImpl;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -41,5 +44,9 @@ public class Config implements WebMvcConfigurer {
     return new RabbitAdmin(connectionFactory);
   }
 
+  @Bean
+  EventPublisherService eventPublisherService(RabbitTemplate rabbitTemplate) {
+    return new EventPublisherServiceImpl(rabbitTemplate);
+  }
 
 }
