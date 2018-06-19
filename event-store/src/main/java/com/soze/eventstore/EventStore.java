@@ -22,6 +22,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.soze.common.events.BaseEvent.*;
@@ -102,6 +103,7 @@ public class EventStore {
   @Scheduled(fixedRate = 5000L)
   private void persist() {
     System.out.println("PERSISTING " + events.size() + " events");
+    long t0 = System.nanoTime();
     try {
       File file = new ClassPathResource("events.json").getFile();
       FileSystemUtils.deleteRecursively(file);
@@ -110,7 +112,7 @@ public class EventStore {
       final String json = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(events);
       FileWriter writer = new FileWriter(file);
       FileCopyUtils.copy(json, writer);
-
+      System.out.println("TOOK " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0) + " ms TO PERSIST " + events.size());
     } catch (JsonProcessingException e) {
       e.printStackTrace();
     } catch (IOException e) {

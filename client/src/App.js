@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import axios from "axios";
 import { Tab, Tabs } from "@material-ui/core/es/index";
 import { Users } from "./Users";
 import { Events } from "./Events";
@@ -15,9 +16,27 @@ class App extends Component {
     this.setState({ value });
   };
 
+  onGenerate = () => {
+    console.log("GENERATING")
+    console.log(this.refs.generate);
+    this.refs.generate.textContent = "GENERATING";
+
+    const promises = [];
+    for(let i = 0; i < 1000; i++) {
+      promises.push(() => axios.post("http://localhost:8001/user/" + Math.random()))
+    }
+
+    const t0 = performance.now();
+
+    Promise.all([promises.map(fn => fn())])
+      .then(() => this.refs.generate.textContent = "generate")
+      .then(() => console.log(performance.now() - t0));
+  }
+
   render() {
     return (
       <div className="App">
+        <button onClick={this.onGenerate} ref={"generate"}>generate</button>
         <Tabs value={this.state.value} onChange={this.handleChange}>
           <Tab label={"Users"}/>
           <Tab label={"Items"}/>
