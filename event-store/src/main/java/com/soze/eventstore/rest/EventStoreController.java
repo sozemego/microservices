@@ -3,7 +3,8 @@ package com.soze.eventstore.rest;
 import com.soze.common.aggregate.AggregateId;
 import com.soze.common.events.BaseEvent;
 import com.soze.eventstore.EventStore;
-import com.soze.eventstore.InvalidEventVersion;
+import com.soze.eventstore.dto.InvalidEventVersionDto;
+import com.soze.eventstore.exception.InvalidEventVersion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -55,7 +56,7 @@ public class EventStoreController {
     try {
       eventStore.handleEvents(events);
     } catch (InvalidEventVersion e) {
-      return ResponseEntity.badRequest().body(e.getMessage());
+      return ResponseEntity.badRequest().body(fromException(e));
     }
     return ResponseEntity.ok().build();
   }
@@ -65,6 +66,15 @@ public class EventStoreController {
              .stream()
              .map(type -> EventType.valueOf(type))
              .collect(Collectors.toSet());
+  }
+
+  private InvalidEventVersionDto fromException(InvalidEventVersion exception) {
+    return new InvalidEventVersionDto(
+      exception.getEvent().getAggregateId().toString(),
+      exception.getEvent().getEventId().toString(),
+      exception.getEvent().getVersion(),
+      exception.getExpectedVersion()
+    );
   }
 
 }

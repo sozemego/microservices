@@ -1,6 +1,5 @@
-package com.soze.eventstore;
+package com.soze.eventstore.exception;
 
-import com.soze.common.aggregate.AggregateId;
 import com.soze.common.events.BaseEvent;
 
 public class InvalidEventVersion extends RuntimeException {
@@ -12,6 +11,10 @@ public class InvalidEventVersion extends RuntimeException {
                              final long expectedVersion) {
     this.event = event;
     this.expectedVersion = expectedVersion;
+  }
+
+  public BaseEvent getEvent() {
+    return event;
   }
 
   public long getExpectedVersion() {

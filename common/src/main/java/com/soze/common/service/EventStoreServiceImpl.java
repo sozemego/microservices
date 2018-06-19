@@ -4,17 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.soze.common.aggregate.AggregateId;
 import com.soze.common.events.BaseEvent;
 import com.soze.common.events.BaseEvent.EventType;
+import com.soze.common.exception.InvalidEventVersion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.io.IOException;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class EventStoreServiceImpl implements EventStoreService {
@@ -112,10 +113,30 @@ public class EventStoreServiceImpl implements EventStoreService {
   private ResponseEntity post(String url, Object message) {
     try {
       return restTemplate.postForEntity(url, message, String.class);
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (HttpClientErrorException e) {
+      Map<String, Object> errorMap = parseMap(e.getResponseBodyAsString());
+      System.out.println(errorMap);
+
+      if(errorMap.get("error").equals("InvalidEventVersion")) {
+        throw new InvalidEventVersion(
+          (String) errorMap.get("aggregateId"),
+          (String) errorMap.get("eventId"),
+          Long.valueOf((int) errorMap.get("eventVersion")),
+          Long.valueOf((int) errorMap.get("expectedVersion"))
+        );
+      }
+
       throw new RuntimeException(e);
     }
+  }
+
+  private Map<String, Object> parseMap(String json) {
+    try {
+      return new ObjectMapper().readValue(json, Map.class);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return new HashMap<>();
   }
 
 }
