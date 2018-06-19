@@ -115,9 +115,8 @@ public class EventStoreServiceImpl implements EventStoreService {
       return restTemplate.postForEntity(url, message, String.class);
     } catch (HttpClientErrorException e) {
       Map<String, Object> errorMap = parseMap(e.getResponseBodyAsString());
-      System.out.println(errorMap);
 
-      if(errorMap.get("error").equals("InvalidEventVersion")) {
+      if("InvalidEventVersion".equals(errorMap.get("error"))) {
         throw new InvalidEventVersion(
           (String) errorMap.get("aggregateId"),
           (String) errorMap.get("eventId"),
