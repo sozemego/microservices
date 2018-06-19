@@ -56,18 +56,10 @@ export class Users extends Component {
                          onKeyDown={(event) => {
                            if(event.keyCode === 13) {
                                this.changeUserName(user.id, event.target.value);
-                               this.changeUserName(user.id, event.target.value);
-                               this.changeUserName(user.id, event.target.value);
-                               this.changeUserName(user.id, event.target.value);
-                               this.changeUserName(user.id, event.target.value);
                            }
                          }}
               />
               <div style={{paddingLeft: "4px", cursor: "pointer"}} onClick={() => {
-                this.deleteUser(user.id)
-                this.deleteUser(user.id)
-                this.deleteUser(user.id)
-                this.deleteUser(user.id)
                 this.deleteUser(user.id)
               }}>DELETE</div>
             </div>
