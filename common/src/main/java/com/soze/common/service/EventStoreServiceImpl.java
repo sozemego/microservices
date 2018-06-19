@@ -22,11 +22,9 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.function.Supplier;
 
 public class EventStoreServiceImpl implements EventStoreService {
 
@@ -44,14 +42,14 @@ public class EventStoreServiceImpl implements EventStoreService {
 
   @Override
   public List<BaseEvent> getAggregateEvents(AggregateId aggregateId) {
-    final ResponseEntity<String> response = get(GET_AGGREGATE_EVENTS + aggregateId.toString(), String.class, 5);
+    final ResponseEntity<String> response = get(GET_AGGREGATE_EVENTS + aggregateId.toString(), String.class);
 
     return parseJson(response.getBody());
   }
 
   @Override
   public List<BaseEvent> getAllEvents() {
-    final ResponseEntity<String> response = get(GET_ALL_EVENTS, String.class, 5);
+    final ResponseEntity<String> response = get(GET_ALL_EVENTS, String.class);
 
     return parseJson(response.getBody());
   }
@@ -68,14 +66,14 @@ public class EventStoreServiceImpl implements EventStoreService {
 
     final String uri = uriComponents.toUriString();
 
-    final ResponseEntity<String> response = get(uri, String.class, 5);
+    final ResponseEntity<String> response = get(uri, String.class);
     return parseJson(response.getBody());
   }
 
   @Override
   public long getAggregateVersion(AggregateId aggregateId) {
     Objects.requireNonNull(aggregateId);
-    final ResponseEntity<String> response = get(GET_AGGREGATE_EVENTS + aggregateId.toString() + "?latest=true", String.class, 5);
+    final ResponseEntity<String> response = get(GET_AGGREGATE_EVENTS + aggregateId.toString() + "?latest=true", String.class);
 
     List<BaseEvent> events = parseJson(response.getBody());
     return events.size();
@@ -94,13 +92,15 @@ public class EventStoreServiceImpl implements EventStoreService {
                            .build();
 
     try {
-      new CallExecutor(config).execute(callable);
+      new CallExecutor(config)
+        .afterFailedTry(l -> System.out.println("Failed calling " + POST_EVENTS + ". Tries: " + l.getTotalTries()))
+        .execute(callable);
     } catch (RetriesExhaustedException e) {
       throw new IllegalStateException("Timeout for url " + POST_EVENTS);
     } catch (UnexpectedException e) {
 
-      if(e.getCause() instanceof HttpClientErrorException) {
-        Map<String, Object> errorMap = parseMap(((HttpClientErrorException)e.getCause()).getResponseBodyAsString());
+      if (e.getCause() instanceof HttpClientErrorException) {
+        Map<String, Object> errorMap = parseMap(((HttpClientErrorException) e.getCause()).getResponseBodyAsString());
         if ("InvalidEventVersion".equals(errorMap.get("error"))) {
           throw new InvalidEventVersion(
             (String) errorMap.get("aggregateId"),
@@ -128,23 +128,27 @@ public class EventStoreServiceImpl implements EventStoreService {
     return new ArrayList<>();
   }
 
-  private <T> ResponseEntity<T> get(String url, Class<T> type, int retries) {
-    final Supplier<ResponseEntity<T>> request = () -> restTemplate.getForEntity(url, type);
-    int tries = retries;
-    while (--tries > 0) {
-      try {
-        System.out.println("Making request to " + url);
-        return request.get();
-      } catch (Exception e) {
-        e.printStackTrace();
-        try {
-          Thread.sleep(2000);
-        } catch (InterruptedException ex) {
-          ex.printStackTrace();
-        }
-      }
+  private <T> ResponseEntity<T> get(String url, Class<T> type) {
+    Callable<ResponseEntity<T>> callable = () -> restTemplate.getForEntity(url, type);
+
+    RetryConfig config = new RetryConfigBuilder()
+                           .withMaxNumberOfTries(5)
+                           .withDelayBetweenTries(2, ChronoUnit.SECONDS)
+                           .withFixedBackoff()
+                           .retryOnAnyException()
+                           .build();
+
+    try {
+      return new CallExecutor<ResponseEntity<T>>(config)
+               .afterFailedTry(l -> System.out.println("FAILED GET: " + url + ". Tries: " + l.getTotalTries()))
+               .execute(callable)
+               .getResult();
+    } catch (RetriesExhaustedException e) {
+      throw new IllegalStateException("Timeout for url " + url);
+    } catch (UnexpectedException e) {
+      throw new RuntimeException(e);
     }
-    throw new IllegalStateException("Could not get " + url + " in " + retries + " retries");
+
   }
 
   private Map<String, Object> parseMap(String json) {
