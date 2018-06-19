@@ -41,9 +41,7 @@ public class ReflectionUtils {
   private static void invoke(Method method, Object target, Object event) {
     try {
       method.invoke(target, event);
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
-    } catch (InvocationTargetException e) {
+    } catch (IllegalAccessException | InvocationTargetException e) {
       e.printStackTrace();
       throw new RuntimeException(e);
     }
