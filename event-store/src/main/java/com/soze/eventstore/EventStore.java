@@ -84,8 +84,8 @@ public class EventStore {
       events.add(event);
       expectedVersions.compute(event.getAggregateId(), (k, v) -> v + 1L);
       System.out.println("HANDLED " + event);
-      eventPublisherService.sendEvent(Config.EXCHANGE, "", event);
     }
+    eventPublisherService.sendEvent(Config.EXCHANGE, "", event);
   }
 
   public void handleEvents(List<BaseEvent> events) {
