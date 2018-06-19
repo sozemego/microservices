@@ -61,6 +61,7 @@ export class Users extends Component {
               />
               <div style={{paddingLeft: "4px", cursor: "pointer"}} onClick={() => {
                 this.deleteUser(user.id)
+                this.changeUserName(user.id, "NEW NAME");
               }}>DELETE</div>
             </div>
           )
