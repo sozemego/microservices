@@ -32,7 +32,7 @@ public class EventStoreServiceFake implements EventStoreService {
   }
 
   @Override
-  public List<BaseEvent> getEvents(final List<EventType> eventTypes) {
+  public List<BaseEvent> getEvents(List<EventType> eventTypes) {
     Set<EventType> typeSet = new HashSet<>(eventTypes);
     return getAllEvents()
              .stream()
@@ -48,5 +48,10 @@ public class EventStoreServiceFake implements EventStoreService {
   public void addEvent(AggregateId aggregateId, BaseEvent event) {
     events.putIfAbsent(aggregateId, new ArrayList<>());
     events.get(aggregateId).add(event);
+  }
+
+  @Override
+  public void send(List<BaseEvent> events) {
+    events.forEach(event -> addEvent(event.getAggregateId(), event));
   }
 }

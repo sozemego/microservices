@@ -45,17 +45,17 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
 //    synchronized (getLock(command.getAggregateId())) {
 
     E aggregate = get(command.getAggregateId());
-    long commandVersion = command.getAggregateVersion();
-    long realVersion = aggregate.getVersion();
-
-    if (commandVersion != realVersion) {
-      update(command.getAggregateId());
-      throw new InvalidAggregateVersion(command.getAggregateId(), commandVersion, realVersion);
-    }
+//    long commandVersion = command.getAggregateVersion();
+//    long realVersion = aggregate.getVersion();
+//
+//    if (commandVersion != realVersion) {
+//      update(command.getAggregateId());
+//      throw new InvalidAggregateVersion(command.getAggregateId(), commandVersion, realVersion);
+//    }
 
     List<BaseEvent> newEvents = ReflectionUtils.processCommand(aggregate, command);
 
-    publish(newEvents);
+    send(newEvents);
     ReflectionUtils.applyEvents(aggregate, newEvents);
 
     return aggregate;
@@ -105,8 +105,9 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
     return eventStoreService.getAggregateVersion(id);
   }
 
-  private void publish(List<BaseEvent> events) {
-    eventPublisherService.sendEvents(exchange, "", events);
+  private void send(List<BaseEvent> events) {
+    eventStoreService.send(events);
+//    eventPublisherService.sendEvents(exchange, "", events);
   }
 
   private Object getLock(AggregateId aggregateId) {

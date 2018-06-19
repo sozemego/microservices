@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.soze.common.aggregate.AggregateId;
 import com.soze.common.events.BaseEvent;
+import com.soze.common.exception.InvalidAggregateVersion;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
@@ -17,6 +19,7 @@ import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
@@ -26,6 +29,7 @@ import static com.soze.common.events.BaseEvent.*;
 public class EventStore {
 
   private final Queue<BaseEvent> events = new ConcurrentLinkedQueue<>();
+  private final Map<AggregateId, Long> expectedVersions = new ConcurrentHashMap<>();
 
   @Value("classpath:events.json")
   private Resource eventsFile;
@@ -62,14 +66,28 @@ public class EventStore {
              .collect(Collectors.toList());
   }
 
-  @RabbitListener(queues = Config.QUEUE, priority = "99")
-  public void handleMessage(BaseEvent event) {
+  public void handleEvent(BaseEvent event) {
     System.out.println(event);
+    validateEventVersion(event);
     events.add(event);
-    persist();
+    expectedVersions.compute(event.getAggregateId(), (k, v) -> v + 1L);
+    System.out.println("HANDLED " + event);
   }
 
+  public void handleEvents(List<BaseEvent> events) {
+    events.forEach(this::handleEvent);
+  }
+
+  private void validateEventVersion(BaseEvent event) {
+    long expectedVersion = expectedVersions.computeIfAbsent(event.getAggregateId(), (v) -> 1L);
+    if(expectedVersion != event.getVersion()) {
+      throw new InvalidEventVersion(event, expectedVersion);
+    }
+  }
+
+  @Scheduled(fixedRate = 5000L)
   private void persist() {
+    System.out.println("PERSISTING " + events.size() + " events");
     try {
       File file = new ClassPathResource("events.json").getFile();
       FileSystemUtils.deleteRecursively(file);
@@ -106,8 +124,7 @@ public class EventStore {
     baseEvents
       .stream()
       .sorted(Comparator.comparing(BaseEvent::getCreatedAt))
-      .peek(System.out::println)
-      .forEach(events::add);
+      .forEach(this::handleEvent);
     System.out.println("READ EVENTS");
   }
 

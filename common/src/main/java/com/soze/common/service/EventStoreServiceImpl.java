@@ -22,6 +22,7 @@ public class EventStoreServiceImpl implements EventStoreService {
   private static final String GET_AGGREGATE_EVENTS = "http://localhost:8000/events/aggregate/";
   private static final String GET_ALL_EVENTS = "http://localhost:8000/events/all";
   private static final String GET_EVENTS_BY_TYPE = "http://localhost:8000/events/type";
+  private static final String POST_EVENTS = "http://localhost:8000/events/post";
 
   private final RestTemplate restTemplate;
 
@@ -69,6 +70,13 @@ public class EventStoreServiceImpl implements EventStoreService {
     return events.size();
   }
 
+  @Override
+  public void send(List<BaseEvent> events) {
+    Objects.requireNonNull(events);
+
+    post(POST_EVENTS, events);
+  }
+
   private List<BaseEvent> parseJson(String json) {
     final ObjectMapper mapper = new ObjectMapper();
     try {
@@ -99,6 +107,10 @@ public class EventStoreServiceImpl implements EventStoreService {
       }
     }
     throw new IllegalStateException("Could not get " + url + " in " + retries + " retries");
+  }
+
+  private ResponseEntity post(String url, Object message) {
+    return restTemplate.postForEntity(url, message, String.class);
   }
 
 }

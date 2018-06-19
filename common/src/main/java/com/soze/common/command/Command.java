@@ -9,6 +9,4 @@ public interface Command {
 
   AggregateId getAggregateId();
 
-  long getAggregateVersion();
-
 }

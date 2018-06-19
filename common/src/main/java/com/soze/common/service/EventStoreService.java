@@ -13,4 +13,6 @@ public interface EventStoreService {
   List<BaseEvent> getEvents(List<BaseEvent.EventType> eventTypes);
 
   long getAggregateVersion(AggregateId aggregateId);
+
+  void send(List<BaseEvent> events);
 }
