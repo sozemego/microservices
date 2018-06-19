@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import static com.soze.common.events.BaseEvent.*;
@@ -52,7 +53,6 @@ public class UserService {
     System.out.println(command);
     validateUsernameDoesNotExist(command.getName());
     validateUsernameIsNotBeingAdded(command.getName());
-    usersBeingAdded.add(command.getName());
 
     userRepository.save(command);
 
@@ -96,7 +96,7 @@ public class UserService {
   }
 
   private void validateUsernameIsNotBeingAdded(String username) {
-    if(usersBeingAdded.contains(username)) {
+    if(!usersBeingAdded.add(username)) {
       throw new IllegalStateException("username: " + username + " already exists");
     }
   }
