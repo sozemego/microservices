@@ -1,5 +1,11 @@
 package com.soze.common.service;
 
+import com.evanlennick.retry4j.CallExecutor;
+import com.evanlennick.retry4j.Status;
+import com.evanlennick.retry4j.config.RetryConfig;
+import com.evanlennick.retry4j.config.RetryConfigBuilder;
+import com.evanlennick.retry4j.exception.RetriesExhaustedException;
+import com.evanlennick.retry4j.exception.UnexpectedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.soze.common.aggregate.AggregateId;
 import com.soze.common.events.BaseEvent;
@@ -10,12 +16,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
 public class EventStoreServiceImpl implements EventStoreService {
@@ -74,8 +84,35 @@ public class EventStoreServiceImpl implements EventStoreService {
   @Override
   public void send(List<BaseEvent> events) {
     Objects.requireNonNull(events);
+    Callable<ResponseEntity> callable = () -> restTemplate.postForEntity(POST_EVENTS, events, String.class);
 
-    post(POST_EVENTS, events);
+    RetryConfig config = new RetryConfigBuilder()
+                           .withFixedBackoff()
+                           .withDelayBetweenTries(2, ChronoUnit.SECONDS)
+                           .withMaxNumberOfTries(5)
+                           .retryOnSpecificExceptions(ResourceAccessException.class)
+                           .build();
+
+    try {
+      new CallExecutor(config).execute(callable);
+    } catch (RetriesExhaustedException e) {
+      throw new IllegalStateException("Timeout for url " + POST_EVENTS);
+    } catch (UnexpectedException e) {
+
+      if(e.getCause() instanceof HttpClientErrorException) {
+        Map<String, Object> errorMap = parseMap(((HttpClientErrorException)e.getCause()).getResponseBodyAsString());
+        if ("InvalidEventVersion".equals(errorMap.get("error"))) {
+          throw new InvalidEventVersion(
+            (String) errorMap.get("aggregateId"),
+            (String) errorMap.get("eventId"),
+            Long.valueOf((int) errorMap.get("eventVersion")),
+            Long.valueOf((int) errorMap.get("expectedVersion"))
+          );
+        }
+      }
+
+      throw new RuntimeException(e.getCause());
+    }
   }
 
   private List<BaseEvent> parseJson(String json) {
@@ -94,7 +131,7 @@ public class EventStoreServiceImpl implements EventStoreService {
   private <T> ResponseEntity<T> get(String url, Class<T> type, int retries) {
     final Supplier<ResponseEntity<T>> request = () -> restTemplate.getForEntity(url, type);
     int tries = retries;
-    while(--tries > 0) {
+    while (--tries > 0) {
       try {
         System.out.println("Making request to " + url);
         return request.get();
@@ -108,25 +145,6 @@ public class EventStoreServiceImpl implements EventStoreService {
       }
     }
     throw new IllegalStateException("Could not get " + url + " in " + retries + " retries");
-  }
-
-  private ResponseEntity post(String url, Object message) {
-    try {
-      return restTemplate.postForEntity(url, message, String.class);
-    } catch (HttpClientErrorException e) {
-      Map<String, Object> errorMap = parseMap(e.getResponseBodyAsString());
-
-      if("InvalidEventVersion".equals(errorMap.get("error"))) {
-        throw new InvalidEventVersion(
-          (String) errorMap.get("aggregateId"),
-          (String) errorMap.get("eventId"),
-          Long.valueOf((int) errorMap.get("eventVersion")),
-          Long.valueOf((int) errorMap.get("expectedVersion"))
-        );
-      }
-
-      throw new RuntimeException(e);
-    }
   }
 
   private Map<String, Object> parseMap(String json) {
