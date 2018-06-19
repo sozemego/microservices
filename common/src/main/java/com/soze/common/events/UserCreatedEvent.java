@@ -5,6 +5,7 @@ import com.soze.common.aggregate.AggregateId;
 
 import java.time.OffsetDateTime;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class UserCreatedEvent extends BaseEvent {
@@ -28,6 +29,11 @@ public class UserCreatedEvent extends BaseEvent {
   public UserCreatedEvent(Map<String, Object> properties) {
     super(properties);
     this.name = (String) properties.get("name");
+  }
+
+  @Override
+  public boolean conflicts(final Set<EventType> eventTypes) {
+    return true;
   }
 
   public String getName() {

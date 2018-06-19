@@ -5,6 +5,7 @@ import com.soze.common.aggregate.AggregateId;
 
 import java.time.OffsetDateTime;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class UserDeletedEvent extends BaseEvent {
@@ -28,6 +29,11 @@ public class UserDeletedEvent extends BaseEvent {
   @Override
   public EventType getType() {
     return EventType.USER_DELETED;
+  }
+
+  @Override
+  public boolean conflicts(final Set<EventType> eventTypes) {
+    return eventTypes.contains(EventType.USER_DELETED);
   }
 
   @Override

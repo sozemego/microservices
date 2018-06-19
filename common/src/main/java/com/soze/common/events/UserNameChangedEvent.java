@@ -2,11 +2,15 @@ package com.soze.common.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.soze.common.aggregate.AggregateId;
+import com.soze.common.utils.CollectionUtils;
 
 import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+
+import static com.soze.common.utils.CollectionUtils.*;
 
 public class UserNameChangedEvent extends BaseEvent {
 
@@ -36,6 +40,17 @@ public class UserNameChangedEvent extends BaseEvent {
   @Override
   public EventType getType() {
     return EventType.USER_NAME_CHANGED;
+  }
+
+  @Override
+  public boolean conflicts(final Set<EventType> eventTypes) {
+    return containsAny(
+      setOf(
+        EventType.USER_DELETED,
+        EventType.USER_NAME_CHANGED
+      ),
+      eventTypes
+    );
   }
 
   @Override

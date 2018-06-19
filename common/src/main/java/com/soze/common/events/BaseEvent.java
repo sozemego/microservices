@@ -6,9 +6,7 @@ import com.soze.common.events.item.ItemCreatedEvent;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @JsonTypeInfo(
   use = JsonTypeInfo.Id.NAME,
@@ -67,6 +65,14 @@ public abstract class BaseEvent implements Serializable {
   }
 
   public abstract EventType getType();
+
+  /**
+   * Implementations should return true if any of the given event types conflict with this event.
+   * If they don't conflict, events can be appended concurrently without consistency issues.
+   * @param eventTypes
+   * @return
+   */
+  public abstract boolean conflicts(Set<EventType> eventTypes);
 
   public enum EventType {
     USER_CREATED, USER_DELETED, USER_NAME_CHANGED,

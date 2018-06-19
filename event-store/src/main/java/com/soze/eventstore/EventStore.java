@@ -56,7 +56,7 @@ public class EventStore {
 
   public List<BaseEvent> getAggregateEvents(AggregateId aggregateId, boolean latest) {
     final List<BaseEvent> events = getAggregateEvents(aggregateId);
-    if(events.isEmpty()) {
+    if (events.isEmpty()) {
       return events;
     }
 
@@ -94,10 +94,22 @@ public class EventStore {
 
   private void validateEventVersion(BaseEvent event) {
     long expectedVersion = expectedVersions.computeIfAbsent(event.getAggregateId(), (v) -> 1L);
-    if(expectedVersion != event.getVersion()) {
+    if (expectedVersion != event.getVersion()) {
       System.out.println("Invalid event version: " + event + " . Expected: " + expectedVersion);
-      throw new InvalidEventVersion(event, expectedVersion);
+      Set<EventType> aheadEventTypes = getEventTypesAfterVersion(event.getAggregateId(), event.getVersion());
+      if (event.conflicts(aheadEventTypes)) {
+        throw new InvalidEventVersion(event, expectedVersion);
+      }
     }
+  }
+
+  private Set<EventType> getEventTypesAfterVersion(AggregateId aggregateId, long version) {
+    return events
+             .stream()
+             .filter(event -> aggregateId.equals(event.getAggregateId()))
+             .filter(event -> event.getVersion() > version)
+             .map(BaseEvent::getType)
+             .collect(Collectors.toSet());
   }
 
   @Scheduled(fixedRate = 5000L)

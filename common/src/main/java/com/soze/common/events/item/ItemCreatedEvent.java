@@ -7,6 +7,7 @@ import com.soze.common.events.BaseEvent;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class ItemCreatedEvent extends BaseEvent {
@@ -38,6 +39,11 @@ public class ItemCreatedEvent extends BaseEvent {
   @Override
   public EventType getType() {
     return EventType.ITEM_CREATED;
+  }
+
+  @Override
+  public boolean conflicts(final Set<EventType> eventTypes) {
+    return eventTypes.contains(EventType.ITEM_CREATED);
   }
 
   public String getName() {
