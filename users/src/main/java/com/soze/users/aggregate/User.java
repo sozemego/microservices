@@ -64,6 +64,9 @@ public class User implements Aggregate {
   }
 
   public List<BaseEvent> process(ChangeUserNameCommand command) {
+    if(isDeleted()) {
+      throw new IllegalStateException(aggregateId + " is already deleted");
+    }
     if(getName().equals(command.getName())) {
       throw new IllegalStateException("User with id " + getAggregateId() + " already has name " + command.getName());
     }
