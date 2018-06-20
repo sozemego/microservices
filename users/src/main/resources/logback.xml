@@ -14,7 +14,7 @@
         </layout>
         <addresses>127.0.0.1:5672</addresses>
         <applicationId>users</applicationId>
-        <exchangeName>EXCHANGE</exchangeName>
+        <exchangeName>EXCHANGE_LOGS</exchangeName>
         <exchangeType>fanout</exchangeType>
         <declareExchange>true</declareExchange>
         <routingKeyPattern></routingKeyPattern>

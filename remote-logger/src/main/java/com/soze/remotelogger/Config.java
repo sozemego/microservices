@@ -12,7 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class Config implements WebMvcConfigurer {
 
   public static final String QUEUE = "LOG_QUEUE";
-  public static final String EXCHANGE = "EXCHANGE";
+  public static final String EXCHANGE = "EXCHANGE_LOGS";
 
   @Bean
   Queue queue() {

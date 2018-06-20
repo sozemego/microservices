@@ -8,7 +8,7 @@ public class LogHandler {
 
   @RabbitListener(queues = Config.QUEUE)
   public void handleLoggedStringMessage(String message) {
-    System.out.println("STRING QUEUE MESSAGE: " + message);
+    System.out.println(message);
   }
 
 }
