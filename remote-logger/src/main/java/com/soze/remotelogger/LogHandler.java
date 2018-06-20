@@ -1,14 +1,13 @@
 package com.soze.remotelogger;
 
-import org.springframework.amqp.rabbit.annotation.*;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class LogHandler {
 
-  @RabbitListener(queues = Config.QUEUE)
-  public void handleLoggedStringMessage(String message) {
-    System.out.println(message);
+  public void handleLog(String applicationId, String log) {
+    System.out.println(applicationId);
+    System.out.println(log);
   }
 
 }

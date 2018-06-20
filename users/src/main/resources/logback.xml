@@ -15,9 +15,9 @@
         <addresses>127.0.0.1:5672</addresses>
         <applicationId>users</applicationId>
         <exchangeName>EXCHANGE_LOGS</exchangeName>
-        <exchangeType>fanout</exchangeType>
+        <exchangeType>topic</exchangeType>
         <declareExchange>true</declareExchange>
-        <routingKeyPattern></routingKeyPattern>
+        <routingKeyPattern>logs.%property{applicationId}</routingKeyPattern>
         <!--<routingKeyPattern>LOGS</routingKeyPattern>-->
         <generateId>true</generateId>
         <charset>UTF-8</charset>
