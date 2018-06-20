@@ -22,4 +22,21 @@ public class LogListener {
     logHandler.handleLog(messageProperties.getAppId(), new String(message.getBody(), "utf-8"));
   }
 
+  @RabbitListener(bindings = @QueueBinding(
+    value = @Queue(Config.QUEUE),
+    exchange = @Exchange(Config.EXCHANGE), key = "logs.COMMAND"
+  ))
+  public void handleCommandMessage(Message message) throws Exception {
+    System.out.println(message);
+  }
+
+  @RabbitListener(bindings = @QueueBinding(
+    value = @Queue(Config.QUEUE),
+    exchange = @Exchange(Config.EXCHANGE), key = "logs.COMMON"
+  ))
+  public void handleCommonMessage(Message message) throws Exception {
+    System.out.println(message);
+  }
+
+
 }

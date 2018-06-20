@@ -13,6 +13,7 @@ public class Config implements WebMvcConfigurer {
 
   public static final String QUEUE = "LOG_QUEUE";
   public static final String EXCHANGE = "EXCHANGE_LOGS";
+  public static final String ROUTING_KEY = "logs.*";
 
   @Bean
   Queue queue() {
@@ -20,13 +21,8 @@ public class Config implements WebMvcConfigurer {
   }
 
   @Bean
-  FanoutExchange exchange() {
-    return new FanoutExchange(EXCHANGE);
-  }
-
-  @Bean
-  Binding binding(Queue queue, FanoutExchange fanoutExchange) {
-    return BindingBuilder.bind(queue).to(fanoutExchange);
+  DirectExchange exchange() {
+    return new DirectExchange(EXCHANGE);
   }
 
   @Bean
