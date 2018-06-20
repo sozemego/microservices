@@ -8,6 +8,8 @@ import com.soze.users.aggregate.User;
 import com.soze.users.commands.ChangeUserNameCommand;
 import com.soze.users.commands.CreateUserCommand;
 import com.soze.users.commands.DeleteUserCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,8 @@ import static com.soze.common.events.BaseEvent.*;
 
 @Service
 public class UserService {
+
+  private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
   private final SourcedRepository<User> userRepository;
   private final EventStoreService eventStoreService;
@@ -40,6 +44,8 @@ public class UserService {
       EventType.USER_DELETED,
       EventType.USER_NAME_CHANGED
     );
+
+    LOG.info("WHAT");
 
     System.out.println("INITIALIZING USER SERVICE");
     List<BaseEvent> events = eventStoreService.getEvents(eventTypes);
