@@ -33,6 +33,9 @@ public class UserDeletedEvent extends BaseEvent {
 
   @Override
   public boolean conflicts(final Set<EventType> eventTypes) {
+    if(eventTypes.isEmpty()) {
+      return false;
+    }
     return true;
   }
 
