@@ -153,6 +153,7 @@ public class EventStore {
       .stream()
       .sorted(Comparator.comparing(BaseEvent::getCreatedAt))
       .forEach(this::handleEvent);
+
     System.out.println("READ EVENTS");
   }
 
