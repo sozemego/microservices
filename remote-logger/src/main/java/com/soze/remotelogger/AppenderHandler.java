@@ -39,7 +39,7 @@ public class AppenderHandler {
 
     PatternLayoutEncoder encoder = new PatternLayoutEncoder();
     encoder.setContext(loggerContext);
-    encoder.setPattern("%msg%n");
+    encoder.setPattern("%msg");
     encoder.start();
     fileAppender.setEncoder(encoder);
     fileAppender.start();
