@@ -25,16 +25,16 @@ public class AppenderHandler {
   public void handleAppender(String applicationId, Marker marker) {
 
     LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-
+    String appenderName = applicationId + "-" + marker.getName() + "-" + APPENDER_SUFFIX;
     Logger logger = loggerContext.getLogger("ROOT");
-    Appender appender = logger.getAppender(applicationId + APPENDER_SUFFIX);
+    Appender appender = logger.getAppender(appenderName);
     if(appender != null) {
       return;
     }
 
     FileAppender fileAppender = new FileAppender<>();
     fileAppender.setContext(loggerContext);
-    fileAppender.setName(applicationId + APPENDER_SUFFIX);
+    fileAppender.setName(appenderName);
     fileAppender.setFile("log/" + applicationId + "/" + marker.getName() + ".log");
 
     PatternLayoutEncoder encoder = new PatternLayoutEncoder();
