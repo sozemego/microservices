@@ -11,14 +11,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class Config implements WebMvcConfigurer {
 
-  public static final String QUEUE = "LOG_QUEUE";
+  public static final String REMOTE_LOGGING_COMMON_QUEUE = "REMOTE_LOGGING_COMMON_QUEUE";
+  public static final String REMOTE_LOGGING_COMMAND_QUEUE = "REMOTE_LOGGING_COMMAND_QUEUE";
+  public static final String REMOTE_LOGGING_API_IN_QUEUE = "REMOTE_LOGGING_API_IN_QUEUE";
+  public static final String REMOTE_LOGGING_API_OUT_QUEUE = "REMOTE_LOGGING_API_OUT_QUEUE";
+  public static final String REMOTE_LOGGING_EVENT_IN_QUEUE = "REMOTE_LOGGING_EVENT_IN_QUEUE";
   public static final String EXCHANGE = "EXCHANGE_LOGS";
-  public static final String ROUTING_KEY = "logs.*";
-
-  @Bean
-  Queue queue() {
-    return new Queue(QUEUE);
-  }
 
   @Bean
   DirectExchange exchange() {

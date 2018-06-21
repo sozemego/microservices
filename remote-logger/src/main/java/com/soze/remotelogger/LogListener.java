@@ -14,6 +14,9 @@ public class LogListener {
 
   private final String COMMAND = "COMMAND";
   private final String COMMON = "COMMON";
+  private final String API_IN = "API_IN";
+  private final String API_OUT = "API_OUT";
+  private final String EVENT_IN = "EVENT_IN";
 
   private final LogHandler logHandler;
 
@@ -23,19 +26,44 @@ public class LogListener {
   }
 
   @RabbitListener(bindings = @QueueBinding(
-    value = @Queue(Config.QUEUE),
-    exchange = @Exchange(Config.EXCHANGE), key = "logs.COMMAND"
+    value = @Queue(Config.REMOTE_LOGGING_COMMAND_QUEUE),
+    exchange = @Exchange(Config.EXCHANGE), key = "logs." + COMMAND
   ))
   public void handleCommandMessage(Message message) throws Exception {
     handleLog(message, COMMAND);
   }
 
   @RabbitListener(bindings = @QueueBinding(
-    value = @Queue(Config.QUEUE),
-    exchange = @Exchange(Config.EXCHANGE), key = "logs.COMMON"
+    value = @Queue(Config.REMOTE_LOGGING_COMMON_QUEUE),
+    exchange = @Exchange(Config.EXCHANGE), key = "logs." + COMMON
   ))
   public void handleCommonMessage(Message message) throws Exception {
     handleLog(message, COMMON);
+  }
+
+
+  @RabbitListener(bindings = @QueueBinding(
+    value = @Queue(Config.REMOTE_LOGGING_API_IN_QUEUE),
+    exchange = @Exchange(Config.EXCHANGE), key = "logs." + API_IN
+  ))
+  public void handleApiInMessage(Message message) throws Exception {
+    handleLog(message, API_IN);
+  }
+
+  @RabbitListener(bindings = @QueueBinding(
+    value = @Queue(Config.REMOTE_LOGGING_API_OUT_QUEUE),
+    exchange = @Exchange(Config.EXCHANGE), key = "logs." + API_OUT
+  ))
+  public void handleApiOutMessage(Message message) throws Exception {
+    handleLog(message, API_OUT);
+  }
+
+  @RabbitListener(bindings = @QueueBinding(
+    value = @Queue(Config.REMOTE_LOGGING_EVENT_IN_QUEUE),
+    exchange = @Exchange(Config.EXCHANGE), key = "logs." + EVENT_IN
+  ))
+  public void handleEventInMessage(Message message) throws Exception {
+    handleLog(message, EVENT_IN);
   }
 
   private void handleLog(Message message, String command) throws Exception {
