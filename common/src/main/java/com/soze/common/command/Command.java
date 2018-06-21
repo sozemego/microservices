@@ -13,7 +13,10 @@ public interface Command {
 
   /**
    * Returns true if given command can only apply to already existing aggregate.
+   * Most commands (except for create commands) will require an existing aggregate.
    */
-  boolean requiresAggregate();
+  default boolean requiresAggregate() {
+    return true;
+  }
 
 }

@@ -17,11 +17,6 @@ public class DeleteProjectCommand implements Command {
   }
 
   @Override
-  public boolean requiresAggregate() {
-    return true;
-  }
-
-  @Override
   public String toString() {
     return "DeleteProjectCommand{" +
              "aggregateId=" + aggregateId +

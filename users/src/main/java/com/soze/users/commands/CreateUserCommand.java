@@ -22,6 +22,11 @@ public class CreateUserCommand implements Command {
   }
 
   @Override
+  public boolean requiresAggregate() {
+    return false;
+  }
+
+  @Override
   public String toString() {
     return "CreateUserCommand{" +
              "userId=" + userId +
