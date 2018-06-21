@@ -3,14 +3,12 @@ package com.soze.projects.aggregate;
 import com.soze.common.aggregate.Aggregate;
 import com.soze.common.aggregate.AggregateId;
 import com.soze.common.events.BaseEvent;
-import com.soze.common.events.project.ProjectCreatedEvent;
-import com.soze.common.events.project.ProjectDeletedEvent;
-import com.soze.common.events.project.ProjectRenamedEvent;
-import com.soze.projects.command.ChangeProjectNameCommand;
-import com.soze.projects.command.CreateProjectCommand;
-import com.soze.projects.command.DeleteProjectCommand;
+import com.soze.common.events.project.*;
+import com.soze.projects.command.*;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,6 +18,9 @@ public class Project implements Aggregate {
   private long version;
   private boolean deleted;
   private String name;
+
+  private OffsetDateTime startDate = OffsetDateTime.ofInstant(Instant.MIN, ZoneId.systemDefault());
+  private OffsetDateTime endDate = OffsetDateTime.ofInstant(Instant.MAX, ZoneId.systemDefault());
 
   public Project() {
 
@@ -49,6 +50,26 @@ public class Project implements Aggregate {
     validateNotDeleted();
     return Arrays.asList(
       new ProjectDeletedEvent(command.getAggregateId(), OffsetDateTime.now(), getVersion() + 1)
+    );
+  }
+
+  public List<BaseEvent> process(ChangeProjectStartDateCommand command) {
+    validateNotDeleted();
+    if(command.getStartDate().isAfter(getStartDate())) {
+      throw new IllegalStateException("Start date cannot be after end date");
+    }
+    return Arrays.asList(
+      new ProjectStartDateChangedEvent(command.getAggregateId(), OffsetDateTime.now(), getVersion() + 1, command.getStartDate())
+    );
+  }
+
+  public List<BaseEvent> process(ChangeProjectEndDateCommand command) {
+    validateNotDeleted();
+    if(command.getEndDate().isBefore(getEndDate())) {
+      throw new IllegalStateException("End date cannot be before start date");
+    }
+    return Arrays.asList(
+      new ProjectEndDateChangedEvent(command.getAggregateId(), OffsetDateTime.now(), getVersion() + 1, command.getEndDate())
     );
   }
 
@@ -88,5 +109,13 @@ public class Project implements Aggregate {
   @Override
   public boolean isDeleted() {
     return deleted;
+  }
+
+  public OffsetDateTime getStartDate() {
+    return startDate;
+  }
+
+  public OffsetDateTime getEndDate() {
+    return endDate;
   }
 }
