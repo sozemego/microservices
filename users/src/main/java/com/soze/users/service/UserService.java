@@ -33,7 +33,7 @@ public class UserService {
 
   @Autowired
   public UserService(SourcedRepository<User> userRepository,
-                     final EventStoreService eventStoreService) {
+                     EventStoreService eventStoreService) {
     this.userRepository = userRepository;
     this.eventStoreService = eventStoreService;
   }
