@@ -94,7 +94,9 @@ public class UserService {
       .stream()
       .filter(user -> username.equals(user.getName()))
       .findFirst()
-      .ifPresent((user) -> new IllegalStateException("username: " + username + " already exists"));
+      .ifPresent((user) -> {
+        throw new IllegalStateException("username: " + username + " already exists");
+      });
   }
 
   private void validateUsernameIsNotBeingAdded(String username) {
