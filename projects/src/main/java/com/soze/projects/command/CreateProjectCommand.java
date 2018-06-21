@@ -23,6 +23,11 @@ public class CreateProjectCommand implements Command {
   }
 
   @Override
+  public boolean requiresAggregate() {
+    return false;
+  }
+
+  @Override
   public String toString() {
     return "CreateProjectCommand{" +
              "aggregateId=" + aggregateId +

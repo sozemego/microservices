@@ -25,6 +25,11 @@ public class ChangeProjectStartDateCommand implements Command {
   }
 
   @Override
+  public boolean requiresAggregate() {
+    return true;
+  }
+
+  @Override
   public String toString() {
     return "ChangeProjectStartDateCommand{" +
              "aggregateId=" + aggregateId +

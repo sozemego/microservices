@@ -23,6 +23,11 @@ public class ChangeProjectNameCommand implements Command {
   }
 
   @Override
+  public boolean requiresAggregate() {
+    return true;
+  }
+
+  @Override
   public String toString() {
     return "ChangeProjectNameCommand{" +
              "aggregateId=" + aggregateId +

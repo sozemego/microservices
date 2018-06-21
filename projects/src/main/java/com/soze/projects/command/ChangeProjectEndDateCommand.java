@@ -25,6 +25,12 @@ public class ChangeProjectEndDateCommand implements Command {
     return endDate;
   }
 
+
+  @Override
+  public boolean requiresAggregate() {
+    return true;
+  }
+
   @Override
   public String toString() {
     return "ChangeProjectEndDateCommand{" +

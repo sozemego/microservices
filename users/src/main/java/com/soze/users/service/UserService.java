@@ -62,12 +62,10 @@ public class UserService {
   }
 
   public void deleteUser(DeleteUserCommand command) {
-    validateAggregateIdExists(command.getAggregateId());
     userRepository.save(command);
   }
 
   public void changeUserName(ChangeUserNameCommand command) {
-    validateAggregateIdExists(command.getAggregateId());
     validateUsernameDoesNotExist(command.getName());
     validateUsernameIsNotBeingAdded(command.getName());
 
@@ -102,12 +100,6 @@ public class UserService {
   private void validateUsernameIsNotBeingAdded(String username) {
     if (!usersBeingAdded.add(username)) {
       throw new IllegalStateException("username: " + username + " already exists");
-    }
-  }
-
-  private void validateAggregateIdExists(AggregateId aggregateId) {
-    if (!userRepository.checkExists(aggregateId)) {
-      throw new IllegalStateException("User with id " + aggregateId + " does not exist");
     }
   }
 

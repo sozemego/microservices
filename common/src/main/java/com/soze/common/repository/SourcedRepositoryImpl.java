@@ -29,12 +29,12 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
 
   @Override
   public E get(AggregateId aggregateId) {
-    return aggregates.computeIfAbsent(aggregateId, (id) -> getAggregateInstance());
+    return aggregates.get(aggregateId);
   }
 
   @Override
   public E save(Command command) {
-    E aggregate = get(command.getAggregateId());
+    E aggregate = command.requiresAggregate() ? getOrThrow(command.getAggregateId()) : validateIsFresh(command.getAggregateId());
     List<BaseEvent> newEvents = ReflectionUtils.processCommand(aggregate, command);
 
     send(newEvents);
@@ -59,9 +59,31 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
     events.forEach(event -> apply(event));
   }
 
+  private E getOrThrow(AggregateId aggregateId) {
+    E aggregate = aggregates.get(aggregateId);
+    if(aggregate == null) {
+      throw new IllegalStateException("AggregateId " + aggregateId + " does not exist");
+    }
+    return aggregate;
+  }
+
   private void apply(BaseEvent event) {
     E aggregate = get(event.getAggregateId());
     ReflectionUtils.applyEvent(aggregate, event);
+  }
+
+  /**
+   * Attempts to check if an aggregate with given id exists.
+   * If it doesn't, returns a new aggregate, otherwise throws IllegalStateException.
+   * @param aggregateId
+   * @return
+   */
+  private E validateIsFresh(AggregateId aggregateId) {
+    E aggregate = get(aggregateId);
+    if(aggregate != null) {
+      throw new IllegalStateException("Aggregate id " + aggregateId + " already exists, but a fresh one is required");
+    }
+    return aggregates.computeIfAbsent(aggregateId, (k) -> getAggregateInstance());
   }
 
   private E getAggregateInstance() {

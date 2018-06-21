@@ -57,7 +57,6 @@ public class ProjectService {
   }
 
   public void changeProjectName(ChangeProjectNameCommand command) {
-    validateAggregateIdExists(command.getAggregateId());
     validateProjectNameDoesNotExist(command.getName());
     validateProjectNameIsNotBeingAdded(command.getName());
 
@@ -65,7 +64,6 @@ public class ProjectService {
   }
 
   public void deleteProject(DeleteProjectCommand command) {
-    validateAggregateIdExists(command.getAggregateId());
     repository.save(command);
   }
 
@@ -89,12 +87,6 @@ public class ProjectService {
   private void validateProjectNameIsNotBeingAdded(String name) {
     if (!addedProjects.add(name)) {
       throw new IllegalStateException("Project name: " + name + " already exists");
-    }
-  }
-
-  private void validateAggregateIdExists(AggregateId aggregateId) {
-    if (!repository.checkExists(aggregateId)) {
-      throw new IllegalStateException("Project with id " + aggregateId + " does not exist");
     }
   }
 

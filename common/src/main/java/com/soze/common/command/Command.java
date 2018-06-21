@@ -11,4 +11,9 @@ public interface Command {
 
   String toString();
 
+  /**
+   * Returns true if given command can only apply to already existing aggregate.
+   */
+  boolean requiresAggregate();
+
 }
