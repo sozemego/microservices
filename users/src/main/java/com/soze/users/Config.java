@@ -1,5 +1,6 @@
 package com.soze.users;
 
+import com.soze.common.aop.CommandAspect;
 import com.soze.common.repository.SourcedRepository;
 import com.soze.common.repository.SourcedRepositoryImpl;
 import com.soze.common.service.*;
@@ -12,12 +13,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@Import({CommandAspect.class})
 public class Config implements WebMvcConfigurer {
 
   public static final String QUEUE = "USER_QUEUE";
@@ -79,8 +82,7 @@ public class Config implements WebMvcConfigurer {
     return new EventPublisherServiceFake(eventStoreServiceFake());
   }
 
-  @Qualifier("SourcedRepositoryImpl")
-  @Bean(name = "SourcedRepositoryImpl")
+  @Bean
   SourcedRepository<User> sourcedRepository(EventStoreService eventStoreService) {
     return new SourcedRepositoryImpl<>(User.class, eventStoreService);
   }

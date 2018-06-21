@@ -32,7 +32,7 @@ public class UserService {
   private final Set<String> usersBeingAdded = Collections.synchronizedSet(new HashSet<>());
 
   @Autowired
-  public UserService(@Qualifier("SourcedRepositoryImpl") SourcedRepository userRepository,
+  public UserService(SourcedRepository<User> userRepository,
                      final EventStoreService eventStoreService) {
     this.userRepository = userRepository;
     this.eventStoreService = eventStoreService;
@@ -53,7 +53,6 @@ public class UserService {
   }
 
   public void createUser(CreateUserCommand command) {
-    LOG.info(MarkerFactory.getMarker("COMMAND"), "Command [{}]", command);
     validateUsernameDoesNotExist(command.getName());
     validateUsernameIsNotBeingAdded(command.getName());
 
