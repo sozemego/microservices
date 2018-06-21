@@ -4,6 +4,7 @@ import com.soze.common.aggregate.AggregateId;
 import com.soze.common.events.UserCreatedEvent;
 import com.soze.common.events.UserNameChangedEvent;
 import com.soze.common.events.project.ProjectCreatedEvent;
+import com.soze.common.events.project.ProjectDeletedEvent;
 import com.soze.common.events.project.ProjectRenamedEvent;
 import com.soze.common.service.EventStoreServiceFake;
 import com.soze.projects.App;
@@ -11,6 +12,7 @@ import com.soze.projects.Config;
 import com.soze.projects.aggregate.Project;
 import com.soze.projects.command.ChangeProjectNameCommand;
 import com.soze.projects.command.CreateProjectCommand;
+import com.soze.projects.command.DeleteProjectCommand;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,9 +53,11 @@ public class ProjectServiceTest {
     projectService.createProject(new CreateProjectCommand(aggregateId, "name"));
     try {
       projectService.createProject(new CreateProjectCommand(aggregateId, "name"));
-    } catch (RuntimeException e) {
-      assertTrue(e.getCause().getCause() instanceof IllegalArgumentException);
+    } catch (IllegalStateException e) {
+      assertTrue(true);
+      return;
     }
+    fail("Did not throw");
   }
 
   @Test
@@ -62,7 +66,6 @@ public class ProjectServiceTest {
     projectService.createProject(new CreateProjectCommand(aggregateId, "name"));
 
     projectService.changeProjectName(new ChangeProjectNameCommand(aggregateId, "new name!"));
-    System.out.println(eventStoreServiceFake.getAllEvents());
     assertEquals(2, eventStoreServiceFake.getAllEvents().size());
     assertTrue(eventStoreServiceFake.getAllEvents().get(0) instanceof ProjectCreatedEvent);
     assertTrue(eventStoreServiceFake.getAllEvents().get(1) instanceof ProjectRenamedEvent);
@@ -70,5 +73,62 @@ public class ProjectServiceTest {
     assertTrue(project.getName().equals("new name!"));
     assertTrue(project.getVersion() == 2);
   }
+
+  @Test
+  public void testDeleteProject() {
+    AggregateId aggregateId = AggregateId.create();
+    Project project = projectService.createProject(new CreateProjectCommand(aggregateId, "name"));
+    assertEquals(project.getName(), "name");
+    assertEquals(1, eventStoreServiceFake.getAllEvents().size());
+    assertTrue(eventStoreServiceFake.getAllEvents().get(0) instanceof ProjectCreatedEvent);
+
+    projectService.deleteProject(new DeleteProjectCommand(aggregateId));
+    assertEquals(2, eventStoreServiceFake.getAllEvents().size());
+    assertTrue(eventStoreServiceFake.getAllEvents().get(1) instanceof ProjectDeletedEvent);
+    assertEquals(null, projectService.getProject(aggregateId));
+  }
+
+  @Test
+  public void testDeleteProjectAlreadyDeleted() {
+    AggregateId aggregateId = AggregateId.create();
+    Project project = projectService.createProject(new CreateProjectCommand(aggregateId, "name"));
+    assertEquals(project.getName(), "name");
+    assertEquals(1, eventStoreServiceFake.getAllEvents().size());
+    assertTrue(eventStoreServiceFake.getAllEvents().get(0) instanceof ProjectCreatedEvent);
+
+    projectService.deleteProject(new DeleteProjectCommand(aggregateId));
+    assertEquals(2, eventStoreServiceFake.getAllEvents().size());
+    assertTrue(eventStoreServiceFake.getAllEvents().get(1) instanceof ProjectDeletedEvent);
+    assertEquals(null, projectService.getProject(aggregateId));
+    try {
+      projectService.deleteProject(new DeleteProjectCommand(aggregateId));
+    } catch (RuntimeException e) {
+      assertTrue(e.getCause().getCause() instanceof IllegalStateException);
+      return;
+    }
+    fail("Did not throw");
+  }
+
+  @Test
+  public void testChangeDeletedProjectName() {
+    AggregateId aggregateId = AggregateId.create();
+    Project project = projectService.createProject(new CreateProjectCommand(aggregateId, "name"));
+    assertEquals(project.getName(), "name");
+    assertEquals(1, eventStoreServiceFake.getAllEvents().size());
+    assertTrue(eventStoreServiceFake.getAllEvents().get(0) instanceof ProjectCreatedEvent);
+
+    projectService.deleteProject(new DeleteProjectCommand(aggregateId));
+    assertEquals(2, eventStoreServiceFake.getAllEvents().size());
+    assertTrue(eventStoreServiceFake.getAllEvents().get(1) instanceof ProjectDeletedEvent);
+    assertEquals(null, projectService.getProject(aggregateId));
+    try {
+      projectService.changeProjectName(new ChangeProjectNameCommand(aggregateId, "next"));
+    } catch (RuntimeException e) {
+      assertTrue(e.getCause().getCause() instanceof IllegalStateException);
+      return;
+    }
+    fail("Did not throw");
+  }
+
 
 }

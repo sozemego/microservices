@@ -7,6 +7,7 @@ import com.soze.common.service.EventStoreService;
 import com.soze.projects.aggregate.Project;
 import com.soze.projects.command.ChangeProjectNameCommand;
 import com.soze.projects.command.CreateProjectCommand;
+import com.soze.projects.command.DeleteProjectCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,8 +64,14 @@ public class ProjectService {
     repository.save(command);
   }
 
+  public void deleteProject(DeleteProjectCommand command) {
+    validateAggregateIdExists(command.getAggregateId());
+    repository.save(command);
+  }
+
   public Project getProject(AggregateId aggregateId) {
-    return repository.get(aggregateId);
+    Project project = repository.get(aggregateId);
+    return project.isDeleted() ? null : project;
   }
 
   private void validateProjectNameDoesNotExist(String name) {
@@ -74,7 +81,9 @@ public class ProjectService {
       .stream()
       .filter(project -> name.equals(project.getName()))
       .findFirst()
-      .ifPresent((user) -> new IllegalStateException("Project name: " + name + " already exists"));
+      .ifPresent((project) -> {
+        throw new IllegalStateException("Project name: " + name + " already exists");
+      });
   }
 
   private void validateProjectNameIsNotBeingAdded(String name) {
