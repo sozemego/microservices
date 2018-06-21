@@ -54,7 +54,7 @@ class App extends Component {
           <Tab label={"Events"}/>
         </Tabs>
         {this.state.value === 0 && <Users/>}
-        {this.state.value === 3 && <Events/>}
+        {this.state.value === 1 && <Events/>}
       </div>
     );
   }
