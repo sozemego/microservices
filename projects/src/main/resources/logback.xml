@@ -1,0 +1,75 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type
+             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="AMQP-MARKER" class="org.springframework.amqp.rabbit.logback.AmqpAppender">
+        <layout>
+            <pattern><![CDATA[ %d %p %t [%c] - <%m>%n ]]></pattern>
+        </layout>
+        <addresses>127.0.0.1:5672</addresses>
+        <applicationId>projects</applicationId>
+        <exchangeName>EXCHANGE_LOGS</exchangeName>
+        <exchangeType>direct</exchangeType>
+        <declareExchange>true</declareExchange>
+        <routingKeyPattern>logs.%marker</routingKeyPattern>
+        <!--<routingKeyPattern>LOGS</routingKeyPattern>-->
+        <generateId>true</generateId>
+        <charset>UTF-8</charset>
+        <durable>true</durable>
+        <deliveryMode>NON_PERSISTENT</deliveryMode>
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
+                <marker>COMMAND</marker>
+                <marker>API_IN</marker>
+                <marker>API_OUT</marker>
+                <marker>EVENT_IN</marker>
+            </evaluator>
+            <onMismatch>DENY</onMismatch>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+    </appender>
+
+    <appender name="AMQP-COMMON" class="org.springframework.amqp.rabbit.logback.AmqpAppender">
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
+                <marker>COMMAND</marker>
+                <marker>API_IN</marker>
+                <marker>API_OUT</marker>
+                <marker>EVENT_IN</marker>
+            </evaluator>
+            <onMismatch>NEUTRAL</onMismatch>
+            <onMatch>DENY</onMatch>
+        </filter>
+        <layout>
+            <pattern><![CDATA[ %d %p %t [%c] - <%m>%n ]]></pattern>
+        </layout>
+        <addresses>127.0.0.1:5672</addresses>
+        <applicationId>projects</applicationId>
+        <exchangeName>EXCHANGE_LOGS</exchangeName>
+        <exchangeType>direct</exchangeType>
+        <declareExchange>true</declareExchange>
+        <routingKeyPattern>logs.COMMON</routingKeyPattern>
+        <!--<routingKeyPattern>LOGS</routingKeyPattern>-->
+        <generateId>true</generateId>
+        <charset>UTF-8</charset>
+        <durable>true</durable>
+        <deliveryMode>NON_PERSISTENT</deliveryMode>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="AMQP-MARKER"/>
+        <appender-ref ref="AMQP-COMMON"/>
+    </root>
+
+    <logger name="org.springframework.amqp.rabbit.core.RabbitTemplate">
+        <level value="warn"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+</configuration>
