@@ -36,6 +36,16 @@
     </appender>
 
     <appender name="AMQP-COMMON" class="org.springframework.amqp.rabbit.logback.AmqpAppender">
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
+                <marker>COMMAND</marker>
+                <marker>API_IN</marker>
+                <marker>API_OUT</marker>
+                <marker>EVENT_IN</marker>
+            </evaluator>
+            <onMismatch>NEUTRAL</onMismatch>
+            <onMatch>DENY</onMatch>
+        </filter>
         <layout>
             <pattern><![CDATA[ %d %p %t [%c] - <%m>%n ]]></pattern>
         </layout>
