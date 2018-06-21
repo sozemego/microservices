@@ -40,10 +40,6 @@ public class User implements Aggregate {
     return version;
   }
 
-  public void setVersion(long version) {
-    this.version = version;
-  }
-
   public boolean isDeleted() {
     return deleted;
   }
@@ -78,17 +74,17 @@ public class User implements Aggregate {
   public void apply(UserCreatedEvent event) {
     this.aggregateId = event.getAggregateId();
     this.name = event.getName();
-    setVersion(event.getVersion());
+    this.version = event.getVersion();
   }
 
   public void apply(UserDeletedEvent event) {
     this.deleted = true;
-    setVersion(event.getVersion());
+    this.version = event.getVersion();
   }
 
   public void apply(UserNameChangedEvent event) {
     this.name = event.getName();
-    setVersion(event.getVersion());
+    this.version = event.getVersion();
   }
 
   @Override

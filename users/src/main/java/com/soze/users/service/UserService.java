@@ -69,6 +69,8 @@ public class UserService {
   public void changeUserName(ChangeUserNameCommand command) {
     validateAggregateIdExists(command.getAggregateId());
     validateUsernameDoesNotExist(command.getName());
+    validateUsernameIsNotBeingAdded(command.getName());
+
     userRepository.save(command);
   }
 
