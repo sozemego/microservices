@@ -20,4 +20,12 @@ public class ChangeUserNameCommand implements Command {
   public String getName() {
     return name;
   }
+
+  @Override
+  public String toString() {
+    return "ChangeUserNameCommand{" +
+             "aggregateId=" + aggregateId +
+             ", name='" + name + '\'' +
+             '}';
+  }
 }

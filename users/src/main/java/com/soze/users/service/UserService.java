@@ -46,15 +46,14 @@ public class UserService {
       EventType.USER_NAME_CHANGED
     );
 
-    System.out.println("INITIALIZING USER SERVICE");
+    LOG.info("INITIALIZING USER SERVICE");
     List<BaseEvent> events = eventStoreService.getEvents(eventTypes);
-    System.out.println("REPLAYING " + events.size() + " events");
+    LOG.info("REPLAYING [{}] events", events.size());
     userRepository.replay(events);
   }
 
   public void createUser(CreateUserCommand command) {
     LOG.info(MarkerFactory.getMarker("COMMAND"), "Command [{}]", command);
-    System.out.println(command);
     validateUsernameDoesNotExist(command.getName());
     validateUsernameIsNotBeingAdded(command.getName());
 
@@ -64,13 +63,11 @@ public class UserService {
   }
 
   public void deleteUser(DeleteUserCommand command) {
-    System.out.println(command);
     validateAggregateIdExists(command.getAggregateId());
     userRepository.save(command);
   }
 
   public void changeUserName(ChangeUserNameCommand command) {
-    System.out.println(command);
     validateAggregateIdExists(command.getAggregateId());
     validateUsernameDoesNotExist(command.getName());
     userRepository.save(command);

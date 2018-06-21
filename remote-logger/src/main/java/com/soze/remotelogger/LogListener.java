@@ -18,7 +18,7 @@ public class LogListener {
   private final LogHandler logHandler;
 
   @Autowired
-  public LogListener(final LogHandler logHandler) {
+  public LogListener(LogHandler logHandler) {
     this.logHandler = logHandler;
   }
 

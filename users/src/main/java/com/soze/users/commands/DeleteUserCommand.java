@@ -14,4 +14,11 @@ public class DeleteUserCommand implements Command {
   public AggregateId getAggregateId() {
     return aggregateId;
   }
+
+  @Override
+  public String toString() {
+    return "DeleteUserCommand{" +
+             "aggregateId=" + aggregateId +
+             '}';
+  }
 }
