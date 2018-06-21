@@ -10,9 +10,7 @@ import com.soze.common.service.EventStoreServiceFake;
 import com.soze.projects.App;
 import com.soze.projects.Config;
 import com.soze.projects.aggregate.Project;
-import com.soze.projects.command.ChangeProjectNameCommand;
-import com.soze.projects.command.CreateProjectCommand;
-import com.soze.projects.command.DeleteProjectCommand;
+import com.soze.projects.command.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +18,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.Date;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.*;
@@ -123,6 +127,64 @@ public class ProjectServiceTest {
     assertEquals(null, projectService.getProject(aggregateId));
     try {
       projectService.changeProjectName(new ChangeProjectNameCommand(aggregateId, "next"));
+    } catch (RuntimeException e) {
+      assertTrue(e.getCause().getCause() instanceof IllegalStateException);
+      return;
+    }
+    fail("Did not throw");
+  }
+
+  @Test
+  public void testChangeStartDate() {
+    AggregateId aggregateId = AggregateId.create();
+    projectService.createProject(new CreateProjectCommand(aggregateId, "name"));
+    Instant instant = Instant.ofEpochMilli(new Calendar.Builder().setDate(2015, 1, 1).build().getTimeInMillis());
+    OffsetDateTime newStartDate = OffsetDateTime.ofInstant(instant, ZoneId.systemDefault());
+    projectService.changeStartDate(new ChangeProjectStartDateCommand(aggregateId, newStartDate));
+
+    Project project = projectService.getProject(aggregateId);
+    assertEquals(newStartDate, project.getStartDate());
+  }
+
+  @Test
+  public void testChangeEndDate() {
+    AggregateId aggregateId = AggregateId.create();
+    projectService.createProject(new CreateProjectCommand(aggregateId, "name"));
+    Instant instant = Instant.ofEpochMilli(new Calendar.Builder().setDate(2015, 1, 1).build().getTimeInMillis());
+    OffsetDateTime newEndDate = OffsetDateTime.ofInstant(instant, ZoneId.systemDefault());
+    projectService.changeEndDate(new ChangeProjectEndDateCommand(aggregateId, newEndDate));
+
+    Project project = projectService.getProject(aggregateId);
+    assertEquals(newEndDate, project.getEndDate());
+  }
+
+  @Test
+  public void testChangeStartDateAfterEndDate() {
+    AggregateId aggregateId = AggregateId.create();
+    projectService.createProject(new CreateProjectCommand(aggregateId, "name"));
+    OffsetDateTime newEndDate = OffsetDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
+    projectService.changeEndDate(new ChangeProjectEndDateCommand(aggregateId, newEndDate));
+
+    OffsetDateTime newStartDate = OffsetDateTime.ofInstant(Instant.ofEpochMilli(Instant.now().toEpochMilli() + 50000), ZoneId.systemDefault());
+    try {
+      projectService.changeStartDate(new ChangeProjectStartDateCommand(aggregateId, newStartDate));
+    } catch (RuntimeException e) {
+      assertTrue(e.getCause().getCause() instanceof IllegalStateException);
+      return;
+    }
+    fail("Did not throw");
+  }
+
+  @Test
+  public void testChangeEndDateBeforeStartDate() {
+    AggregateId aggregateId = AggregateId.create();
+    projectService.createProject(new CreateProjectCommand(aggregateId, "name"));
+    OffsetDateTime newStartDate = OffsetDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
+    projectService.changeStartDate(new ChangeProjectStartDateCommand(aggregateId, newStartDate));
+
+    OffsetDateTime newEndDate = OffsetDateTime.ofInstant(Instant.ofEpochMilli(Instant.now().toEpochMilli() - 50000), ZoneId.systemDefault());
+    try {
+      projectService.changeEndDate(new ChangeProjectEndDateCommand(aggregateId, newEndDate));
     } catch (RuntimeException e) {
       assertTrue(e.getCause().getCause() instanceof IllegalStateException);
       return;

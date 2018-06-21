@@ -5,9 +5,7 @@ import com.soze.common.events.BaseEvent;
 import com.soze.common.repository.SourcedRepository;
 import com.soze.common.service.EventStoreService;
 import com.soze.projects.aggregate.Project;
-import com.soze.projects.command.ChangeProjectNameCommand;
-import com.soze.projects.command.CreateProjectCommand;
-import com.soze.projects.command.DeleteProjectCommand;
+import com.soze.projects.command.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +62,14 @@ public class ProjectService {
   }
 
   public void deleteProject(DeleteProjectCommand command) {
+    repository.save(command);
+  }
+
+  public void changeStartDate(ChangeProjectStartDateCommand command) {
+    repository.save(command);
+  }
+
+  public void changeEndDate(ChangeProjectEndDateCommand command) {
     repository.save(command);
   }
 
