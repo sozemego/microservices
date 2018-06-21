@@ -23,13 +23,8 @@ public class LogHandler {
   }
 
   public void handleLog(String applicationId, LogLevel logLevel, Marker marker, String log) {
-    marker.add(getApplicationIdMarker(applicationId));
     appenderHandler.handleAppender(applicationId, marker);
     getMethod(logLevel).accept(marker, log);
-  }
-
-  private Marker getApplicationIdMarker(String applicationId) {
-    return MarkerFactory.getMarker(applicationId);
   }
 
   private BiConsumer<Marker, String> getMethod(LogLevel logLevel) {

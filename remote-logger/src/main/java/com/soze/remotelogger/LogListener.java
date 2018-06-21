@@ -1,5 +1,6 @@
 package com.soze.remotelogger;
 
+import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
@@ -10,6 +11,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LogListener {
+
+  private final String COMMAND = "COMMAND";
+  private final String COMMON = "COMMON";
 
   private final LogHandler logHandler;
 
@@ -23,14 +27,7 @@ public class LogListener {
     exchange = @Exchange(Config.EXCHANGE), key = "logs.COMMAND"
   ))
   public void handleCommandMessage(Message message) throws Exception {
-    MessageProperties messageProperties = message.getMessageProperties();
-    String logLevel = (String) messageProperties.getHeaders().get("level");
-    logHandler.handleLog(
-      messageProperties.getAppId(),
-      LogLevel.valueOf(logLevel),
-      MarkerFactory.getMarker("COMMAND"),
-      new String(message.getBody(), "utf-8")
-    );
+    handleLog(message, COMMAND);
   }
 
   @RabbitListener(bindings = @QueueBinding(
@@ -38,8 +35,24 @@ public class LogListener {
     exchange = @Exchange(Config.EXCHANGE), key = "logs.COMMON"
   ))
   public void handleCommonMessage(Message message) throws Exception {
-    System.out.println(message);
+    handleLog(message, COMMON);
   }
 
+  private void handleLog(Message message, String command) throws Exception {
+    MessageProperties messageProperties = message.getMessageProperties();
+    String logLevel = (String) messageProperties.getHeaders().get("level");
+    logHandler.handleLog(
+      messageProperties.getAppId(),
+      LogLevel.valueOf(logLevel),
+      getMarker(command, messageProperties.getAppId()),
+      new String(message.getBody(), "utf-8")
+    );
+  }
+
+  private Marker getMarker(String command, String applicationId) {
+    Marker commandMarker = MarkerFactory.getDetachedMarker(command);
+    commandMarker.add(MarkerFactory.getMarker(applicationId));
+    return commandMarker;
+  }
 
 }

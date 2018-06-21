@@ -20,19 +20,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class AppenderHandler {
 
+  private static final String APPENDER_SUFFIX = "-FILE-APPENDER";
+
   public void handleAppender(String applicationId, Marker marker) {
 
     LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 
     Logger logger = loggerContext.getLogger("ROOT");
-    Appender appender = logger.getAppender(applicationId + "-FILE-APPENDER");
+    Appender appender = logger.getAppender(applicationId + APPENDER_SUFFIX);
     if(appender != null) {
       return;
     }
 
     FileAppender fileAppender = new FileAppender<>();
     fileAppender.setContext(loggerContext);
-    fileAppender.setName(applicationId + "-FILE-APPENDER");
+    fileAppender.setName(applicationId + APPENDER_SUFFIX);
     fileAppender.setFile("log/" + applicationId + "/" + marker.getName() + ".log");
 
     PatternLayoutEncoder encoder = new PatternLayoutEncoder();
