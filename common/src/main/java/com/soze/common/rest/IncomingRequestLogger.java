@@ -19,21 +19,33 @@ public class IncomingRequestLogger extends HandlerInterceptorAdapter {
 
   private static final Logger LOG = LoggerFactory.getLogger(IncomingRequestLogger.class);
   private static final Marker API_IN = MarkerFactory.getMarker("API_IN");
+  private static final Marker API_OUT = MarkerFactory.getMarker("API_OUT");
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
     LOG.info(
       API_IN,
-      "[{}][{}][{}][{}]",
+      "IN|[{}][{}][{}][{}]",
       request.getRemoteUser() != null ? request.getRemoteUser() : "anonymous",
       request.getRemoteAddr(),
       request.getMethod(),
-      request.getRequestURI());
+      request.getRequestURI()
+    );
     return super.preHandle(request, response, handler);
   }
 
   @Override
   public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+    LOG.info(
+      API_OUT,
+      "OUT|[{}][{}][{}][{}][{}][{}]",
+      request.getRemoteUser() != null ? request.getRemoteUser() : "anonymous",
+      request.getRemoteAddr(),
+      request.getMethod(),
+      request.getRequestURI(),
+      response.getStatus(),
+      response.getContentType()
+    );
     super.postHandle(request, response, handler, modelAndView);
   }
 
