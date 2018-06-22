@@ -21,6 +21,7 @@ public class Config implements WebMvcConfigurer {
 
   public static final String QUEUE = "EVENT_STORE_QUEUE";
   public static final String EXCHANGE = "EXCHANGE";
+  public static final String KEY = "events.#";
 
   @Autowired
   private IncomingRequestLogger incomingRequestLogger;
@@ -31,13 +32,13 @@ public class Config implements WebMvcConfigurer {
   }
 
   @Bean
-  FanoutExchange fanoutExchange() {
-    return new FanoutExchange(EXCHANGE);
+  DirectExchange directExchange() {
+    return new DirectExchange(EXCHANGE);
   }
 
   @Bean
-  Binding fanoutBinding(Queue queue, FanoutExchange fanoutExchange) {
-    return BindingBuilder.bind(queue).to(fanoutExchange);
+  Binding fanoutBinding(Queue queue, DirectExchange directExchange) {
+    return BindingBuilder.bind(queue).to(directExchange).with(KEY);
   }
 
   @Override
