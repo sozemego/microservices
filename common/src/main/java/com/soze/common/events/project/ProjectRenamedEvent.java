@@ -1,5 +1,6 @@
 package com.soze.common.events.project;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.soze.common.aggregate.AggregateId;
 import com.soze.common.events.BaseEvent;
 
@@ -24,6 +25,7 @@ public class ProjectRenamedEvent extends BaseEvent {
     this(UUID.randomUUID(), aggregateId, createdAt, version, name);
   }
 
+  @JsonCreator
   public ProjectRenamedEvent(Map<String, Object> properties) {
     super(properties);
     this.name = (String) properties.get("name");

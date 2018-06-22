@@ -1,5 +1,6 @@
 package com.soze.common.events.project;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.soze.common.aggregate.AggregateId;
 import com.soze.common.events.BaseEvent;
 
@@ -21,6 +22,7 @@ public class ProjectStartDateChangedEvent extends BaseEvent {
     this(UUID.randomUUID(), aggregateId, createdAt, version, startDate);
   }
 
+  @JsonCreator
   public ProjectStartDateChangedEvent(Map<String, Object> properties) {
     super(properties);
     this.startDate = OffsetDateTime.parse((String) properties.get("startDate"));
