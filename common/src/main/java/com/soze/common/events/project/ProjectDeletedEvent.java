@@ -24,6 +24,10 @@ public class ProjectDeletedEvent extends BaseEvent {
     super(properties);
   }
 
+  public boolean isDeleted() {
+    return true;
+  }
+
   @Override
   public EventType getType() {
     return EventType.PROJECT_DELETED;
