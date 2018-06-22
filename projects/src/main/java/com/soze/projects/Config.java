@@ -1,6 +1,7 @@
 package com.soze.projects;
 
 import com.soze.common.aop.CommandAspect;
+import com.soze.common.aop.EventAspect;
 import com.soze.common.repository.SourcedRepository;
 import com.soze.common.repository.SourcedRepositoryImpl;
 import com.soze.common.rest.IncomingRequestLogger;
@@ -22,7 +23,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@Import({CommandAspect.class, IncomingRequestLogger.class})
+@Import({CommandAspect.class, EventAspect.class, IncomingRequestLogger.class})
 public class Config implements WebMvcConfigurer {
 
   public static final String QUEUE = "PROJECT_QUEUE";
