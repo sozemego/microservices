@@ -139,6 +139,7 @@ public class ProjectService {
       .values()
       .stream()
       .filter(project -> name.equals(project.getName()))
+      .filter(project -> !project.isDeleted())
       .findFirst()
       .ifPresent((project) -> {
         throw new IllegalStateException("Project name: " + name + " already exists");
