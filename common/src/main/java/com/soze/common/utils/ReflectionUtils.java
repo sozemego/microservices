@@ -17,15 +17,13 @@ public class ReflectionUtils {
   private static Method NO_OPERATION_METHOD = getNoop();
 
   public static void applyEvent(Object target, Object event) {
+    Method method = getMethod(APPLY, target, event.getClass());
+    invoke(method, target, event);
+
     List<Field> fields = getAllFields(target.getClass());
     List<Method> getters = getAllGetters(event.getClass());
     Map<Field, Method> fieldMethodMap = matchFieldsAndGetters(fields, getters);
-    if(!fieldMethodMap.isEmpty()) {
-      apply(fieldMethodMap, event, target);
-    } else {
-      Method method = getMethod(APPLY, target, event.getClass());
-      invoke(method, target, event);
-    }
+    apply(fieldMethodMap, event, target);
   }
 
   public static void applyEvents(Object target, List<BaseEvent> events) {
@@ -47,7 +45,6 @@ public class ReflectionUtils {
     try {
       method.invoke(target, event);
     } catch (IllegalAccessException | InvocationTargetException e) {
-      e.printStackTrace();
       throw new RuntimeException(e);
     }
   }
@@ -59,10 +56,20 @@ public class ReflectionUtils {
     try {
       return target.getClass().getMethod(name, clazz);
     } catch (NoSuchMethodException e) {
-      e.printStackTrace();
+
     }
 
     return NO_OPERATION_METHOD;
+  }
+
+  private static boolean hasMethod(String name, Object target, Class clazz) {
+    try {
+      target.getClass().getMethod(name, clazz);
+    } catch (NoSuchMethodException e) {
+      e.printStackTrace();
+      return false;
+    }
+    return true;
   }
 
   private static Method getNoop() {
