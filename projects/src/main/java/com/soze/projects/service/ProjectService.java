@@ -89,12 +89,12 @@ public class ProjectService {
   }
 
   public void assignUserToProject(AssignUserToProjectCommand command) {
-    validateUserExists(command.getAggregateId());
+    validateUserExists(command.getUserId());
     repository.save(command);
   }
 
   public void removeUserFromProject(RemoveUserFromProjectCommand command) {
-    validateUserExists(command.getAggregateId());
+    validateUserExists(command.getUserId());
     repository.save(command);
   }
 

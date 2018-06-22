@@ -133,4 +133,12 @@ public class Project implements Aggregate {
   public OffsetDateTime getEndDate() {
     return endDate;
   }
+
+  public Set<AggregateId> getUsers() {
+    return new HashSet<>(users);
+  }
+
+  public void setUsers(Set<AggregateId> users) {
+    this.users = users;
+  }
 }

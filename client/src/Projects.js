@@ -1,25 +1,54 @@
 import React, {Component} from "react";
 import axios from "axios";
-import { Button, TextField } from "@material-ui/core/es/index";
+import { Button, Chip, Select, TextField } from "@material-ui/core/es/index";
+import MenuItem from '@material-ui/core/MenuItem';
 
 export class Projects extends Component {
 
   constructor(props) {
     super(props);
-    this.fetchProjects();
+    this.fetchAll();
     this.state = {
       projects: [],
+      users: [],
     };
   }
 
   componentWillReceiveProps = (props) => {
-    this.fetchProjects();
+    this.fetchAll();
   };
 
   fetchProjects = () => {
     fetch("http://localhost:8002/project/all")
       .then(response => response.json())
       .then(projects => this.setState({projects}));
+  };
+
+  fetchUsers = () => {
+    fetch("http://localhost:8001/user/all")
+      .then(response => response.json())
+      .then(users => this.setState({users}));
+  };
+
+  userItem = (userId) => {
+    const {users} = this.state;
+    const user = users.find(user => user === userId);
+    if(!user) return null;
+    return (
+      <Chip key={user.id} >{user.name}</Chip>
+    );
+  };
+
+  getUsers = (projectId) => {
+    const project = this.state.projects.find(p => p.id === projectId);
+
+    return this.state.users.filter(user => {
+      return !project.userIds.find(userId => userId === user.id);
+    }).map(user => {
+      return (
+        <MenuItem key={user.id} value={user.id}>{user.name}</MenuItem>
+      )
+    });
   };
 
   getProjectComponent = (project) => {
@@ -44,6 +73,12 @@ export class Projects extends Component {
                    onChange={e => this.changeProjectEndDate(project.id, new Date(e.target.value))}
                    style={{margin: "4px"}}
         />
+        <Select value={''}
+                onChange={(e) => this.assignUserToProject(project.id, e.target.value)}
+        >
+          {this.getUsers(project.id)}
+        </Select>
+        {project.userIds.map(this.userItem)}
         <div style={{cursor: "pointer", margin: "4px"}} onClick={() => this.deleteProject(project.id)}>DELETE</div>
       </div>
     );
@@ -56,27 +91,37 @@ export class Projects extends Component {
 
   deleteProject = (id) => {
     axios.delete("http://localhost:8002/project/" + id)
-      .then(this.fetchProjects);
+      .then(this.fetchAll);
   };
 
   addProject = (name) => {
     axios.post("http://localhost:8002/project/create/" + encodeURIComponent(name))
-      .then(this.fetchProjects);
+      .then(this.fetchAll);
   };
 
   changeProjectName = (id, name) => {
     axios.patch("http://localhost:8002/project/name/" + id + "?name=" + encodeURIComponent(name))
-      .then(this.fetchProjects);
+      .then(this.fetchAll);
   };
 
   changeProjectStartDate = (id, date) => {
     axios.patch("http://localhost:8002/project/startdate/" + id + "?startdate=" + date.toISOString())
-      .then(this.fetchProjects);
+      .then(this.fetchAll);
   };
 
   changeProjectEndDate = (id, date) => {
     axios.patch("http://localhost:8002/project/enddate/" + id + "?enddate=" + date.toISOString())
-      .then(this.fetchProjects);
+      .then(this.fetchAll);
+  };
+
+  assignUserToProject = (projectId, userId) => {
+    axios.post("http://localhost:8002/project/assign/" + projectId + "?userId=" + userId)
+      .then(this.fetchAll)
+  };
+
+  fetchAll = () => {
+    this.fetchProjects();
+    this.fetchUsers();
   };
 
   render() {
@@ -96,7 +141,7 @@ export class Projects extends Component {
             <div key={project.id} style={{border: "1px solid black", margin: "2px"}}>
               {this.getProjectComponent(project)}
             </div>
-          )
+          );
         })}
       </div>
     )

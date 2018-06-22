@@ -61,6 +61,26 @@ public class ProjectRest {
     return ResponseEntity.ok().build();
   }
 
+  @PostMapping("/assign/{aggregateId}")
+  public ResponseEntity assignUser(@PathVariable("aggregateId") String aggregateId,
+                                   @RequestParam("userId") String userId) {
+    projectService.assignUserToProject(new AssignUserToProjectCommand(
+      AggregateId.fromString(aggregateId),
+      AggregateId.fromString(userId)
+    ));
+    return ResponseEntity.ok().build();
+  }
+
+  @PostMapping("/remove/{aggregateId}")
+  public ResponseEntity removeUser(@PathVariable("aggregateId") String aggregateId,
+                                   @RequestParam("userId") String userId) {
+    projectService.removeUserFromProject(new RemoveUserFromProjectCommand(
+      AggregateId.fromString(aggregateId),
+      AggregateId.fromString(userId)
+    ));
+    return ResponseEntity.ok().build();
+  }
+
   private List<ProjectDto> convertToDtos(List<Project> projects) {
     return projects
              .stream()
@@ -73,7 +93,8 @@ public class ProjectRest {
       project.getAggregateId().toString(),
       project.getName(),
       project.getStartDate().toString(),
-      project.getEndDate().toString()
+      project.getEndDate().toString(),
+      project.getUsers().stream().map(AggregateId::toString).collect(Collectors.toSet())
     );
   }
 
