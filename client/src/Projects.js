@@ -32,10 +32,10 @@ export class Projects extends Component {
 
   userItem = (userId) => {
     const {users} = this.state;
-    const user = users.find(user => user === userId);
+    const user = users.find(user => user.id === userId);
     if(!user) return null;
     return (
-      <Chip key={user.id} >{user.name}</Chip>
+      <Chip key={user.id} label={user.name}/>
     );
   };
 
