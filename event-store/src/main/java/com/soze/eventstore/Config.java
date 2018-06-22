@@ -19,27 +19,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Import({IncomingRequestLogger.class})
 public class Config implements WebMvcConfigurer {
 
-  public static final String QUEUE = "EVENT_STORE_QUEUE";
   public static final String EXCHANGE = "EXCHANGE";
-  public static final String KEY = "events.#";
 
   @Autowired
   private IncomingRequestLogger incomingRequestLogger;
-
-  @Bean
-  Queue queue() {
-    return new Queue(QUEUE);
-  }
-
-  @Bean
-  DirectExchange directExchange() {
-    return new DirectExchange(EXCHANGE);
-  }
-
-  @Bean
-  Binding fanoutBinding(Queue queue, DirectExchange directExchange) {
-    return BindingBuilder.bind(queue).to(directExchange).with(KEY);
-  }
 
   @Override
   public void addCorsMappings(final CorsRegistry registry) {

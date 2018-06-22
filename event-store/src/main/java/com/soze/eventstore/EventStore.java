@@ -89,7 +89,7 @@ public class EventStore {
       expectedVersions.compute(event.getAggregateId(), (k, v) -> v + 1L);
       LOG.info("Handled event [{}]", event);
     }
-    eventPublisherService.sendEvent(Config.EXCHANGE, "", event);
+    eventPublisherService.sendEvent(Config.EXCHANGE, "events." + event.getClass().getSimpleName(), event);
   }
 
   public void handleEvents(List<BaseEvent> events) {
