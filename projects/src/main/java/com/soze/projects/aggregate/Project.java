@@ -73,33 +73,6 @@ public class Project implements Aggregate {
     );
   }
 
-  public void apply(ProjectCreatedEvent event) {
-    this.aggregateId = event.getAggregateId();
-    this.name = event.getName();
-    this.version = event.getVersion();
-  }
-
-  public void apply(ProjectRenamedEvent event) {
-    this.aggregateId = event.getAggregateId();
-    this.name = event.getName();
-    this.version = event.getVersion();
-  }
-
-  public void apply(ProjectDeletedEvent event) {
-    this.deleted = true;
-    this.version = event.getVersion();
-  }
-
-  public void apply(ProjectStartDateChangedEvent event) {
-    this.startDate = event.getStartDate();
-    this.version = event.getVersion();
-  }
-
-  public void apply(ProjectEndDateChangedEvent event) {
-    this.endDate = event.getEndDate();
-    this.version = event.getVersion();
-  }
-
   private void validateNotDeleted() {
     if (isDeleted()) {
       throw new IllegalStateException("Project with id " + aggregateId + " is already deleted");
