@@ -20,7 +20,12 @@ public class ReflectionUtils {
     List<Field> fields = getAllFields(target.getClass());
     List<Method> getters = getAllGetters(event.getClass());
     Map<Field, Method> fieldMethodMap = matchFieldsAndGetters(fields, getters);
-    apply(fieldMethodMap, event, target);
+    if(!fieldMethodMap.isEmpty()) {
+      apply(fieldMethodMap, event, target);
+    } else {
+      Method method = getMethod(APPLY, target, event.getClass());
+      invoke(method, target, event);
+    }
   }
 
   public static void applyEvents(Object target, List<BaseEvent> events) {

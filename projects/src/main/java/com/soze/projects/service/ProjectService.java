@@ -88,6 +88,22 @@ public class ProjectService {
     repository.save(command);
   }
 
+  public void assignUserToProject(AssignUserToProjectCommand command) {
+    validateUserExists(command.getAggregateId());
+    repository.save(command);
+  }
+
+  public void removeUserFromProject(RemoveUserFromProjectCommand command) {
+    validateUserExists(command.getAggregateId());
+    repository.save(command);
+  }
+
+  private void validateUserExists(AggregateId userId) {
+    if(!users.contains(userId)) {
+      throw new IllegalStateException("User " + userId + " does not exist");
+    }
+  }
+
   public Project getProject(AggregateId aggregateId) {
     Project project = repository.get(aggregateId);
     return project.isDeleted() ? null : project;

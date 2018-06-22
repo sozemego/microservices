@@ -23,6 +23,8 @@ import java.util.*;
   @JsonSubTypes.Type(value = ProjectDeletedEvent.class, name = "PROJECT_DELETED"),
   @JsonSubTypes.Type(value = ProjectStartDateChangedEvent.class, name = "PROJECT_START_DATE_CHANGED"),
   @JsonSubTypes.Type(value = ProjectEndDateChangedEvent.class, name = "PROJECT_END_DATE_CHANGED"),
+  @JsonSubTypes.Type(value = UserAssignedToProjectEvent.class, name = "USER_ASSIGNED_TO_PROJECT"),
+  @JsonSubTypes.Type(value = UserRemovedFromProjectEvent.class, name = "USER_REMOVED_FROM_PROJECT"),
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class BaseEvent implements Serializable {
@@ -82,7 +84,8 @@ public abstract class BaseEvent implements Serializable {
 
     USER_CREATED, USER_DELETED, USER_NAME_CHANGED,
 
-    PROJECT_CREATED, PROJECT_RENAMED, PROJECT_DELETED, PROJECT_START_DATE_CHANGED, PROJECT_END_DATE_CHANGED
+    PROJECT_CREATED, PROJECT_RENAMED, PROJECT_DELETED, PROJECT_START_DATE_CHANGED, PROJECT_END_DATE_CHANGED,
+    USER_ASSIGNED_TO_PROJECT, USER_REMOVED_FROM_PROJECT
   }
 
   @Override
