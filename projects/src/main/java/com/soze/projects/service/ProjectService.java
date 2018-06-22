@@ -15,6 +15,8 @@ import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.soze.common.events.BaseEvent.EventType.*;
+
 @Service
 public class ProjectService {
 
@@ -35,7 +37,7 @@ public class ProjectService {
   @PostConstruct
   public void setup() {
     List<BaseEvent.EventType> eventTypes = Arrays.asList(
-
+      PROJECT_CREATED, PROJECT_DELETED, PROJECT_END_DATE_CHANGED, PROJECT_RENAMED, PROJECT_START_DATE_CHANGED
     );
 
     LOG.info("INITIALIZING PROJECT SERVICE");
