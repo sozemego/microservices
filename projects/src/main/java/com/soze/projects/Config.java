@@ -33,21 +33,6 @@ public class Config implements WebMvcConfigurer {
   private IncomingRequestLogger incomingRequestLogger;
 
   @Bean
-  Queue queue() {
-    return new Queue(QUEUE);
-  }
-
-  @Bean
-  FanoutExchange exchange() {
-    return new FanoutExchange(EXCHANGE);
-  }
-
-  @Bean
-  Binding binding(Queue queue, FanoutExchange fanoutExchange) {
-    return BindingBuilder.bind(queue).to(fanoutExchange);
-  }
-
-  @Bean
   public AmqpAdmin amqpAdmin(ConnectionFactory connectionFactory) {
     return new RabbitAdmin(connectionFactory);
   }

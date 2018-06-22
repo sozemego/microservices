@@ -12,8 +12,8 @@ import com.soze.projects.aggregate.Project;
 import com.soze.projects.command.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.annotation.*;
+import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,6 @@ import static com.soze.common.events.BaseEvent.*;
 import static com.soze.common.events.BaseEvent.EventType.*;
 
 @Service
-@RabbitListener(queues = Config.QUEUE)
 public class ProjectService {
 
   private static final Logger LOG = LoggerFactory.getLogger(ProjectService.class);
@@ -118,12 +117,16 @@ public class ProjectService {
              .collect(Collectors.toList());
   }
 
-  @RabbitHandler
+  @RabbitListener(bindings = @QueueBinding(
+    value = @Queue(Config.QUEUE), exchange = @Exchange(Config.EXCHANGE), key = "events.user.UserCreatedEvent"
+  ))
   public void apply(UserCreatedEvent event) {
     users.add(event.getAggregateId());
   }
 
-  @RabbitHandler
+  @RabbitListener(bindings = @QueueBinding(
+    value = @Queue(Config.QUEUE), exchange = @Exchange(Config.EXCHANGE), key = "events.user.UserDeletedEvent"
+  ))
   public void apply(UserDeletedEvent event) {
     users.remove(event.getAggregateId());
   }
