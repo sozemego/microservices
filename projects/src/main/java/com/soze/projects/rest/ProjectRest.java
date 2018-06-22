@@ -2,18 +2,15 @@ package com.soze.projects.rest;
 
 import com.soze.common.aggregate.AggregateId;
 import com.soze.projects.aggregate.Project;
-import com.soze.projects.command.CreateProjectCommand;
-import com.soze.projects.command.DeleteProjectCommand;
+import com.soze.projects.command.*;
 import com.soze.projects.dto.ProjectDto;
 import com.soze.projects.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,6 +40,24 @@ public class ProjectRest {
   @DeleteMapping("/{aggregateId}")
   public ResponseEntity deleteProject(@PathVariable("aggregateId") String aggregateId) {
     projectService.deleteProject(new DeleteProjectCommand(AggregateId.fromString(aggregateId)));
+    return ResponseEntity.ok().build();
+  }
+
+  @PatchMapping("/name/{aggregateId}")
+  public ResponseEntity changeProjectName(@PathVariable("aggregateId") String aggregateId, @RequestParam("name") String name) {
+    projectService.changeProjectName(new ChangeProjectNameCommand(AggregateId.fromString(aggregateId), name));
+    return ResponseEntity.ok().build();
+  }
+
+  @PatchMapping("/startdate/{aggregateId}")
+  public ResponseEntity changeStartDate(@PathVariable("aggregateId") String aggregateId, @RequestParam("startdate") String startDate) {
+    projectService.changeProjectStartDate(new ChangeProjectStartDateCommand(AggregateId.fromString(aggregateId), OffsetDateTime.parse(startDate)));
+    return ResponseEntity.ok().build();
+  }
+
+  @PatchMapping("/enddate/{aggregateId}")
+  public ResponseEntity changeEndDate(@PathVariable("aggregateId") String aggregateId, @RequestParam("enddate") String endDate) {
+    projectService.changeProjectEndDate(new ChangeProjectEndDateCommand(AggregateId.fromString(aggregateId), OffsetDateTime.parse(endDate)));
     return ResponseEntity.ok().build();
   }
 

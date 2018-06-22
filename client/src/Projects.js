@@ -23,15 +23,35 @@ export class Projects extends Component {
   };
 
   getProjectComponent = (project) => {
-    console.log(project);
     return (
-      <div style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-        <div>{project.name}</div>
-        <div>{project.startDate}</div>
-        <div>{project.endDate}</div>
-        <div style={{cursor: "pointer"}} onClick={() => this.deleteProject(project.id)}>DELETE</div>
+      <div style={{display: "flex", flexDirection: "row", justifyContent: "start", alignItems: "center"}}>
+        <TextField defaultValue={project.name}
+                   label={"name"}
+                   onKeyDown={(event) => {
+                     if(event.keyCode === 13) {
+                       this.changeProjectName(project.id, event.target.value);
+                     }
+                   }}
+                   style={{margin: "4px"}}
+        />
+        <TextField defaultValue={this.getDateDefaultValue(project.startDate)}
+                   type={"date"}
+                   onChange={e => this.changeProjectStartDate(project.id, new Date(e.target.value))}
+                   style={{margin: "4px"}}
+        />
+        <TextField defaultValue={this.getDateDefaultValue(project.endDate)}
+                   type={"date"}
+                   onChange={e => this.changeProjectEndDate(project.id, new Date(e.target.value))}
+                   style={{margin: "4px"}}
+        />
+        <div style={{cursor: "pointer", margin: "4px"}} onClick={() => this.deleteProject(project.id)}>DELETE</div>
       </div>
     );
+  };
+
+  getDateDefaultValue = (dateStr) => {
+    const date = new Date(dateStr);
+    return date.toISOString().substr(0, 10);
   };
 
   deleteProject = (id) => {
@@ -40,7 +60,22 @@ export class Projects extends Component {
   };
 
   addProject = (name) => {
-    axios.post("http://localhost:8002/project/create/" + name)
+    axios.post("http://localhost:8002/project/create/" + encodeURIComponent(name))
+      .then(this.fetchProjects);
+  };
+
+  changeProjectName = (id, name) => {
+    axios.patch("http://localhost:8002/project/name/" + id + "?name=" + encodeURIComponent(name))
+      .then(this.fetchProjects);
+  };
+
+  changeProjectStartDate = (id, date) => {
+    axios.patch("http://localhost:8002/project/startdate/" + id + "?startdate=" + date.toISOString())
+      .then(this.fetchProjects);
+  };
+
+  changeProjectEndDate = (id, date) => {
+    axios.patch("http://localhost:8002/project/enddate/" + id + "?enddate=" + date.toISOString())
       .then(this.fetchProjects);
   };
 
@@ -49,7 +84,6 @@ export class Projects extends Component {
       <div>
         <TextField id={"name"}
                    label={"name"}
-                   onChange={(e) => this.setState({filter: e.target.value})}
                    onKeyDown={(event) => {
                      if(event.keyCode === 13) {
                        this.addProject(event.target.value);
