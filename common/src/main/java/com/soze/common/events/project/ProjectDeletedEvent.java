@@ -1,5 +1,6 @@
 package com.soze.common.events.project;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.soze.common.aggregate.AggregateId;
 import com.soze.common.events.BaseEvent;
 
@@ -10,7 +11,6 @@ import java.util.UUID;
 
 public class ProjectDeletedEvent extends BaseEvent {
 
-
   public ProjectDeletedEvent(UUID eventId, AggregateId aggregateId, OffsetDateTime createdAt, long version) {
     super(eventId, aggregateId, createdAt, version);
   }
@@ -19,8 +19,13 @@ public class ProjectDeletedEvent extends BaseEvent {
     super(UUID.randomUUID(), aggregateId, createdAt, version);
   }
 
+  @JsonCreator
   public ProjectDeletedEvent(Map<String, Object> properties) {
     super(properties);
+  }
+
+  public boolean isDeleted() {
+    return true;
   }
 
   @Override
@@ -35,4 +40,6 @@ public class ProjectDeletedEvent extends BaseEvent {
     }
     return true;
   }
+
+
 }

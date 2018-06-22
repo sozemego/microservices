@@ -71,22 +71,6 @@ public class User implements Aggregate {
     );
   }
 
-  public void apply(UserCreatedEvent event) {
-    this.aggregateId = event.getAggregateId();
-    this.name = event.getName();
-    this.version = event.getVersion();
-  }
-
-  public void apply(UserDeletedEvent event) {
-    this.deleted = true;
-    this.version = event.getVersion();
-  }
-
-  public void apply(UserNameChangedEvent event) {
-    this.name = event.getName();
-    this.version = event.getVersion();
-  }
-
   @Override
   public String toString() {
     return "User{" +

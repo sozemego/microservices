@@ -12,39 +12,38 @@ import java.util.UUID;
 import static com.soze.common.utils.CollectionUtils.containsAny;
 import static com.soze.common.utils.CollectionUtils.setOf;
 
-public class ProjectRenamedEvent extends BaseEvent {
+public class UserRemovedFromProjectEvent extends BaseEvent {
 
-  private final String name;
+  private final AggregateId userId;
 
-  public ProjectRenamedEvent(UUID eventId, AggregateId aggregateId, OffsetDateTime createdAt, long version, String name) {
+  public UserRemovedFromProjectEvent(UUID eventId, AggregateId aggregateId, OffsetDateTime createdAt, long version, AggregateId userId) {
     super(eventId, aggregateId, createdAt, version);
-    this.name = name;
+    this.userId = userId;
   }
 
-  public ProjectRenamedEvent(AggregateId aggregateId, OffsetDateTime createdAt, long version, String name) {
-    this(UUID.randomUUID(), aggregateId, createdAt, version, name);
+  public UserRemovedFromProjectEvent(AggregateId aggregateId, OffsetDateTime createdAt, long version, AggregateId userId) {
+    this(UUID.randomUUID(), aggregateId, createdAt, version, userId);
   }
 
   @JsonCreator
-  public ProjectRenamedEvent(Map<String, Object> properties) {
+  public UserRemovedFromProjectEvent(Map<String, Object> properties) {
     super(properties);
-    this.name = (String) properties.get("name");
+    this.userId = AggregateId.fromString((String) properties.get("userId"));
   }
 
-  public String getName() {
-    return name;
+  public AggregateId getUserId() {
+    return userId;
   }
 
   @Override
   public EventType getType() {
-    return EventType.PROJECT_RENAMED;
+    return EventType.USER_REMOVED_FROM_PROJECT;
   }
 
   @Override
   public boolean conflicts(Set<EventType> eventTypes) {
     return containsAny(
       setOf(
-        EventType.PROJECT_RENAMED,
         EventType.PROJECT_DELETED
       ),
       eventTypes
@@ -53,8 +52,8 @@ public class ProjectRenamedEvent extends BaseEvent {
 
   @Override
   public String toString() {
-    return "ProjectRenamedEvent{" +
-             "name='" + name + '\'' +
+    return "UserRemovedFromProjectEvent{" +
+             "userId=" + userId +
              '}';
   }
 }

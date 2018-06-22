@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.*;
 
 public class Project implements Aggregate {
 
@@ -20,6 +21,8 @@ public class Project implements Aggregate {
   private long version;
   private boolean deleted;
   private String name;
+
+  private Set<AggregateId> users = new HashSet<>();
 
   private OffsetDateTime startDate = OffsetDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault());
   private OffsetDateTime endDate = OffsetDateTime.ofInstant(
@@ -78,30 +81,31 @@ public class Project implements Aggregate {
     );
   }
 
-  public void apply(ProjectCreatedEvent event) {
-    this.aggregateId = event.getAggregateId();
-    this.name = event.getName();
+  public List<BaseEvent> process(AssignUserToProjectCommand command) {
+    if(users.contains(command.getUserId())) {
+      throw new IllegalStateException("User " + command.getUserId() + " already added to project " + getAggregateId());
+    }
+    return Arrays.asList(
+      new UserAssignedToProjectEvent(command.getAggregateId(), OffsetDateTime.now(), getVersion() + 1, command.getUserId())
+    );
+  }
+
+  public List<BaseEvent> process(RemoveUserFromProjectCommand command) {
+    if(!users.contains(command.getUserId())) {
+      throw new IllegalStateException("User " + command.getUserId() + " not added to project " + getAggregateId());
+    }
+    return Arrays.asList(
+      new UserRemovedFromProjectEvent(command.getAggregateId(), OffsetDateTime.now(), getVersion() + 1, command.getUserId())
+    );
+  }
+
+  public void apply(UserAssignedToProjectEvent event) {
+    this.users.add(event.getUserId());
     this.version = event.getVersion();
   }
 
-  public void apply(ProjectRenamedEvent event) {
-    this.aggregateId = event.getAggregateId();
-    this.name = event.getName();
-    this.version = event.getVersion();
-  }
-
-  public void apply(ProjectDeletedEvent event) {
-    this.deleted = true;
-    this.version = event.getVersion();
-  }
-
-  public void apply(ProjectStartDateChangedEvent event) {
-    this.startDate = event.getStartDate();
-    this.version = event.getVersion();
-  }
-
-  public void apply(ProjectEndDateChangedEvent event) {
-    this.endDate = event.getEndDate();
+  public void apply(UserRemovedFromProjectEvent event) {
+    this.users.remove(event.getUserId());
     this.version = event.getVersion();
   }
 
@@ -133,4 +137,9 @@ public class Project implements Aggregate {
   public OffsetDateTime getEndDate() {
     return endDate;
   }
+
+  public Set<AggregateId> getUsers() {
+    return new HashSet<>(users);
+  }
+
 }

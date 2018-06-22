@@ -1,6 +1,7 @@
 package com.soze.projects;
 
 import com.soze.common.aop.CommandAspect;
+import com.soze.common.aop.EventAspect;
 import com.soze.common.repository.SourcedRepository;
 import com.soze.common.repository.SourcedRepositoryImpl;
 import com.soze.common.rest.IncomingRequestLogger;
@@ -22,7 +23,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@Import({CommandAspect.class, IncomingRequestLogger.class})
+@Import({CommandAspect.class, EventAspect.class, IncomingRequestLogger.class})
 public class Config implements WebMvcConfigurer {
 
   public static final String QUEUE = "PROJECT_QUEUE";
@@ -30,21 +31,6 @@ public class Config implements WebMvcConfigurer {
 
   @Autowired
   private IncomingRequestLogger incomingRequestLogger;
-
-  @Bean
-  Queue queue() {
-    return new Queue(QUEUE);
-  }
-
-  @Bean
-  FanoutExchange exchange() {
-    return new FanoutExchange(EXCHANGE);
-  }
-
-  @Bean
-  Binding binding(Queue queue, FanoutExchange fanoutExchange) {
-    return BindingBuilder.bind(queue).to(fanoutExchange);
-  }
 
   @Bean
   public AmqpAdmin amqpAdmin(ConnectionFactory connectionFactory) {

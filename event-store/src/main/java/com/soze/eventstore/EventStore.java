@@ -6,6 +6,8 @@ import com.soze.common.aggregate.AggregateId;
 import com.soze.common.events.BaseEvent;
 import com.soze.common.service.EventPublisherService;
 import com.soze.eventstore.exception.InvalidEventVersion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -29,6 +31,8 @@ import static com.soze.common.events.BaseEvent.*;
 
 @Service
 public class EventStore {
+
+  private static final Logger LOG = LoggerFactory.getLogger(EventStore.class);
 
   private final EventPublisherService eventPublisherService;
 
@@ -79,13 +83,13 @@ public class EventStore {
 
   public void handleEvent(BaseEvent event) {
     synchronized (getLock(event.getAggregateId())) {
-      System.out.println("HANDLING STARTED " + event);
+      LOG.info("Handling [{}]", event);
       validateEventVersion(event);
       events.add(event);
       expectedVersions.compute(event.getAggregateId(), (k, v) -> v + 1L);
-      System.out.println("HANDLED " + event);
+      LOG.info("Handled event [{}]", event);
     }
-    eventPublisherService.sendEvent(Config.EXCHANGE, "", event);
+    eventPublisherService.sendEvent(Config.EXCHANGE, "events." + event.getClass().getSimpleName(), event);
   }
 
   public void handleEvents(List<BaseEvent> events) {
@@ -95,7 +99,7 @@ public class EventStore {
   private void validateEventVersion(BaseEvent event) {
     long expectedVersion = expectedVersions.computeIfAbsent(event.getAggregateId(), (v) -> 1L);
     if (expectedVersion != event.getVersion()) {
-      System.out.println("Invalid event version: " + event + " . Expected: " + expectedVersion);
+      LOG.info("Invalid event version: [{}]. Expected [{}]", event, expectedVersion);
       Set<EventType> aheadEventTypes = getEventTypesAfterVersion(event.getAggregateId(), event.getVersion());
       if (event.conflicts(aheadEventTypes)) {
         throw new InvalidEventVersion(event, expectedVersion);
@@ -112,9 +116,9 @@ public class EventStore {
              .collect(Collectors.toSet());
   }
 
-  @Scheduled(fixedRate = 5000L)
+  @Scheduled(fixedRate = 60 * 1000L)
   private void persist() {
-    System.out.println("PERSISTING " + events.size() + " events");
+    LOG.info("Persisting [{}] events", events.size());
     long t0 = System.nanoTime();
     try {
       File file = new ClassPathResource("events.json").getFile();
@@ -124,7 +128,7 @@ public class EventStore {
       final String json = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(events);
       FileWriter writer = new FileWriter(file);
       FileCopyUtils.copy(json, writer);
-      System.out.println("TOOK " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0) + " ms TO PERSIST " + events.size());
+      LOG.info("Took [{}ms] to persist [{}] events", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0) , events.size());
     } catch (JsonProcessingException e) {
       e.printStackTrace();
     } catch (IOException e) {
@@ -133,7 +137,7 @@ public class EventStore {
   }
 
   private void loadEvents() throws IOException {
-    System.out.println("READING EVENTS");
+    LOG.info("Reading events from file");
     final String json = StreamUtils.copyToString(
       eventsFile.getInputStream(),
       Charset.defaultCharset()) + "\n";
@@ -154,7 +158,7 @@ public class EventStore {
       .sorted(Comparator.comparing(BaseEvent::getCreatedAt))
       .forEach(this::handleEvent);
 
-    System.out.println("READ EVENTS");
+    LOG.info("Read [{}] events from file", baseEvents.size());
   }
 
   private Object getLock(AggregateId aggregateId) {
