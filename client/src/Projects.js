@@ -30,12 +30,12 @@ export class Projects extends Component {
       .then(users => this.setState({users}));
   };
 
-  userItem = (userId) => {
+  userItem = (userId, projectId) => {
     const {users} = this.state;
     const user = users.find(user => user.id === userId);
     if(!user) return null;
     return (
-      <Chip key={user.id} label={user.name}/>
+      <Chip key={user.id} label={user.name} onDelete={() => this.removeUserFromProject(projectId, userId)}/>
     );
   };
 
@@ -79,7 +79,7 @@ export class Projects extends Component {
         >
           {this.getUsers(project.id)}
         </Select>
-        {project.userIds.map(this.userItem)}
+        {project.userIds.map(id => this.userItem(id, project.id))}
         <div style={{cursor: "pointer", margin: "4px"}} onClick={() => this.deleteProject(project.id)}>DELETE</div>
       </div>
     );
@@ -117,6 +117,11 @@ export class Projects extends Component {
 
   assignUserToProject = (projectId, userId) => {
     axios.post("http://localhost:8002/project/assign/" + projectId + "?userId=" + userId)
+      .then(this.fetchAll)
+  };
+
+  removeUserFromProject = (projectId, userId) => {
+    axios.post("http://localhost:8002/project/remove/" + projectId + "?userId=" + userId)
       .then(this.fetchAll)
   };
 
