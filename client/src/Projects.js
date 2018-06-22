@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import axios from "axios";
-import { TextField } from "@material-ui/core/es/index";
+import { Button, TextField } from "@material-ui/core/es/index";
 
 export class Projects extends Component {
 
@@ -23,19 +23,26 @@ export class Projects extends Component {
   };
 
   getProjectComponent = (project) => {
+    console.log(project);
     return (
       <div style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
         <div>{project.name}</div>
         <div>{project.startDate}</div>
         <div>{project.endDate}</div>
+        <div style={{cursor: "pointer"}} onClick={() => this.deleteProject(project.id)}>DELETE</div>
       </div>
-    )
-  }
+    );
+  };
+
+  deleteProject = (id) => {
+    axios.delete("http://localhost:8002/project/" + id)
+      .then(this.fetchProjects);
+  };
 
   addProject = (name) => {
     axios.post("http://localhost:8002/project/create/" + name)
       .then(this.fetchProjects);
-  }
+  };
 
   render() {
     return (
@@ -52,7 +59,7 @@ export class Projects extends Component {
         />
         {this.state.projects.map(project => {
           return (
-            <div key={project.aggregateId} style={{border: "1px solid black", margin: "2px"}}>
+            <div key={project.id} style={{border: "1px solid black", margin: "2px"}}>
               {this.getProjectComponent(project)}
             </div>
           )
