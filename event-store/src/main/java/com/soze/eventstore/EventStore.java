@@ -116,7 +116,7 @@ public class EventStore {
              .collect(Collectors.toSet());
   }
 
-  @Scheduled(fixedRate = 5000L)
+  @Scheduled(fixedRate = 60 * 1000L)
   private void persist() {
     LOG.info("Persisting [{}] events", events.size());
     long t0 = System.nanoTime();
