@@ -55,7 +55,7 @@ public class Project implements Aggregate {
 
   public List<BaseEvent> process(ChangeProjectStartDateCommand command) {
     validateNotDeleted();
-    if(command.getStartDate().isAfter(getStartDate())) {
+    if(command.getStartDate().isAfter(getEndDate())) {
       throw new IllegalStateException("Start date cannot be after end date");
     }
     return Arrays.asList(
@@ -65,7 +65,7 @@ public class Project implements Aggregate {
 
   public List<BaseEvent> process(ChangeProjectEndDateCommand command) {
     validateNotDeleted();
-    if(command.getEndDate().isBefore(getEndDate())) {
+    if(command.getEndDate().isBefore(getStartDate())) {
       throw new IllegalStateException("End date cannot be before start date");
     }
     return Arrays.asList(
@@ -87,6 +87,16 @@ public class Project implements Aggregate {
 
   public void apply(ProjectDeletedEvent event) {
     this.deleted = true;
+    this.version = event.getVersion();
+  }
+
+  public void apply(ProjectStartDateChangedEvent event) {
+    this.startDate = event.getStartDate();
+    this.version = event.getVersion();
+  }
+
+  public void apply(ProjectEndDateChangedEvent event) {
+    this.endDate = event.getEndDate();
     this.version = event.getVersion();
   }
 
