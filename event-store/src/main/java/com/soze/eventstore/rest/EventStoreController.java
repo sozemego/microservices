@@ -40,7 +40,8 @@ public class EventStoreController {
   }
 
   @GetMapping("/type")
-  public ResponseEntity getEventsByType(@RequestParam("type") List<String> types) {
+  public ResponseEntity getEventsByType(@RequestParam(name = "type", required = false) List<String> types) {
+    types = types == null ? new ArrayList<>() : types;
     final List<BaseEvent> aggregateEvents = eventStore.getAggregateEvents(fromStrings(types));
     return ResponseEntity.ok(aggregateEvents);
   }
