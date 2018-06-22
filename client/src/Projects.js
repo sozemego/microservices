@@ -13,7 +13,7 @@ export class Projects extends Component {
   }
 
   componentWillReceiveProps = (props) => {
-    this.fetchUsers();
+    this.fetchProjects();
   };
 
   fetchProjects = () => {
