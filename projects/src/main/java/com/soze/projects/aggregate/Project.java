@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 public class Project implements Aggregate {
@@ -19,8 +20,11 @@ public class Project implements Aggregate {
   private boolean deleted;
   private String name;
 
-  private OffsetDateTime startDate = OffsetDateTime.ofInstant(Instant.MIN, ZoneId.systemDefault());
-  private OffsetDateTime endDate = OffsetDateTime.ofInstant(Instant.MAX, ZoneId.systemDefault());
+  private OffsetDateTime startDate = OffsetDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault());
+  private OffsetDateTime endDate = OffsetDateTime.ofInstant(
+    new Calendar.Builder().setDate(2050, 12, 12).build().toInstant(),
+    ZoneId.systemDefault()
+  );
 
   public Project() {
 

@@ -4,6 +4,7 @@ import axios from "axios";
 import { Tab, Tabs } from "@material-ui/core/es/index";
 import { Users } from "./Users";
 import { Events } from "./Events";
+import { Projects } from "./Projects";
 
 class App extends Component {
 
@@ -51,10 +52,12 @@ class App extends Component {
         <button onClick={this.onGenerate} ref={"generate"}>generate</button>
         <Tabs value={this.state.value} onChange={this.handleChange}>
           <Tab label={"Users"}/>
+          <Tab label={"Projects"}/>
           <Tab label={"Events"}/>
         </Tabs>
         {this.state.value === 0 && <Users/>}
-        {this.state.value === 1 && <Events/>}
+        {this.state.value === 1 && <Projects/>}
+        {this.state.value === 2 && <Events/>}
       </div>
     );
   }
