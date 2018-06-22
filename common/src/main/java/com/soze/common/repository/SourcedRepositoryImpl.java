@@ -68,7 +68,7 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
   }
 
   private void apply(BaseEvent event) {
-    E aggregate = get(event.getAggregateId());
+    E aggregate = getOrNew(event.getAggregateId());
     ReflectionUtils.applyEvent(aggregate, event);
   }
 
@@ -83,6 +83,10 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
     if(aggregate != null) {
       throw new IllegalStateException("Aggregate id " + aggregateId + " already exists, but a fresh one is required");
     }
+    return aggregates.computeIfAbsent(aggregateId, (k) -> getAggregateInstance());
+  }
+
+  private E getOrNew(AggregateId aggregateId) {
     return aggregates.computeIfAbsent(aggregateId, (k) -> getAggregateInstance());
   }
 
