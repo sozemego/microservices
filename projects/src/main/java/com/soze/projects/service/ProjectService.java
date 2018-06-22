@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectService {
@@ -76,6 +77,15 @@ public class ProjectService {
   public Project getProject(AggregateId aggregateId) {
     Project project = repository.get(aggregateId);
     return project.isDeleted() ? null : project;
+  }
+
+  public List<Project> getAllProjects() {
+    return repository
+             .getAll()
+             .values()
+             .stream()
+             .filter(project -> !project.isDeleted())
+             .collect(Collectors.toList());
   }
 
   private void validateProjectNameDoesNotExist(String name) {
