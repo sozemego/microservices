@@ -49,4 +49,11 @@ public class UserRemovedFromProjectEvent extends BaseEvent {
       eventTypes
     );
   }
+
+  @Override
+  public String toString() {
+    return "UserRemovedFromProjectEvent{" +
+             "userId=" + userId +
+             '}';
+  }
 }

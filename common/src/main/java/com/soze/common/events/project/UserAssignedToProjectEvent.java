@@ -49,4 +49,11 @@ public class UserAssignedToProjectEvent extends BaseEvent {
       eventTypes
     );
   }
+
+  @Override
+  public String toString() {
+    return "UserAssignedToProjectEvent{" +
+             "userId=" + userId +
+             '}';
+  }
 }

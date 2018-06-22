@@ -41,4 +41,11 @@ public class ProjectEndDateChangedEvent extends BaseEvent {
   public boolean conflicts(Set<EventType> eventTypes) {
     return false;
   }
+
+  @Override
+  public String toString() {
+    return "ProjectEndDateChangedEvent{" +
+             "endDate=" + endDate +
+             '}';
+  }
 }

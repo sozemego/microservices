@@ -44,10 +44,17 @@ public class ProjectRenamedEvent extends BaseEvent {
   public boolean conflicts(Set<EventType> eventTypes) {
     return containsAny(
       setOf(
-//        EventType.USER_DELETED,
-        EventType.PROJECT_RENAMED
+        EventType.PROJECT_RENAMED,
+        EventType.PROJECT_DELETED
       ),
       eventTypes
     );
+  }
+
+  @Override
+  public String toString() {
+    return "ProjectRenamedEvent{" +
+             "name='" + name + '\'' +
+             '}';
   }
 }
