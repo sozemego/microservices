@@ -33,6 +33,7 @@ public class Config implements WebMvcConfigurer {
   private IncomingRequestLogger incomingRequestLogger;
 
   @Bean
+  @Profile("!integration")
   public AmqpAdmin amqpAdmin(ConnectionFactory connectionFactory) {
     return new RabbitAdmin(connectionFactory);
   }

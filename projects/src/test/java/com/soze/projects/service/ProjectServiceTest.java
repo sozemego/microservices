@@ -140,7 +140,7 @@ public class ProjectServiceTest {
     projectService.createProject(new CreateProjectCommand(aggregateId, "name"));
     Instant instant = Instant.ofEpochMilli(new Calendar.Builder().setDate(2015, 1, 1).build().getTimeInMillis());
     OffsetDateTime newStartDate = OffsetDateTime.ofInstant(instant, ZoneId.systemDefault());
-    projectService.changeStartDate(new ChangeProjectStartDateCommand(aggregateId, newStartDate));
+    projectService.changeProjectStartDate(new ChangeProjectStartDateCommand(aggregateId, newStartDate));
 
     Project project = projectService.getProject(aggregateId);
     assertEquals(newStartDate, project.getStartDate());
@@ -152,7 +152,7 @@ public class ProjectServiceTest {
     projectService.createProject(new CreateProjectCommand(aggregateId, "name"));
     Instant instant = Instant.ofEpochMilli(new Calendar.Builder().setDate(2015, 1, 1).build().getTimeInMillis());
     OffsetDateTime newEndDate = OffsetDateTime.ofInstant(instant, ZoneId.systemDefault());
-    projectService.changeEndDate(new ChangeProjectEndDateCommand(aggregateId, newEndDate));
+    projectService.changeProjectEndDate(new ChangeProjectEndDateCommand(aggregateId, newEndDate));
 
     Project project = projectService.getProject(aggregateId);
     assertEquals(newEndDate, project.getEndDate());
@@ -163,11 +163,11 @@ public class ProjectServiceTest {
     AggregateId aggregateId = AggregateId.create();
     projectService.createProject(new CreateProjectCommand(aggregateId, "name"));
     OffsetDateTime newEndDate = OffsetDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
-    projectService.changeEndDate(new ChangeProjectEndDateCommand(aggregateId, newEndDate));
+    projectService.changeProjectEndDate(new ChangeProjectEndDateCommand(aggregateId, newEndDate));
 
     OffsetDateTime newStartDate = OffsetDateTime.ofInstant(Instant.ofEpochMilli(Instant.now().toEpochMilli() + 50000), ZoneId.systemDefault());
     try {
-      projectService.changeStartDate(new ChangeProjectStartDateCommand(aggregateId, newStartDate));
+      projectService.changeProjectStartDate(new ChangeProjectStartDateCommand(aggregateId, newStartDate));
     } catch (RuntimeException e) {
       assertTrue(e.getCause().getCause() instanceof IllegalStateException);
       return;
@@ -180,11 +180,11 @@ public class ProjectServiceTest {
     AggregateId aggregateId = AggregateId.create();
     projectService.createProject(new CreateProjectCommand(aggregateId, "name"));
     OffsetDateTime newStartDate = OffsetDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
-    projectService.changeStartDate(new ChangeProjectStartDateCommand(aggregateId, newStartDate));
+    projectService.changeProjectStartDate(new ChangeProjectStartDateCommand(aggregateId, newStartDate));
 
     OffsetDateTime newEndDate = OffsetDateTime.ofInstant(Instant.ofEpochMilli(Instant.now().toEpochMilli() - 50000), ZoneId.systemDefault());
     try {
-      projectService.changeEndDate(new ChangeProjectEndDateCommand(aggregateId, newEndDate));
+      projectService.changeProjectEndDate(new ChangeProjectEndDateCommand(aggregateId, newEndDate));
     } catch (RuntimeException e) {
       assertTrue(e.getCause().getCause() instanceof IllegalStateException);
       return;

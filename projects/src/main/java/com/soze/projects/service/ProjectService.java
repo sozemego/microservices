@@ -120,14 +120,14 @@ public class ProjectService {
   }
 
   @RabbitListener(bindings = @QueueBinding(
-    value = @Queue(Config.QUEUE + "USER_CREATED_EVENT"), exchange = @Exchange(Config.EXCHANGE), key = "events.UserCreatedEvent"
+    value = @Queue(Config.QUEUE + "_USER_CREATED_EVENT"), exchange = @Exchange(Config.EXCHANGE), key = "events.UserCreatedEvent"
   ))
   public void apply(UserCreatedEvent event) {
     users.add(event.getAggregateId());
   }
 
   @RabbitListener(bindings = @QueueBinding(
-    value = @Queue(Config.QUEUE + "USER_DELETED_EVENT"), exchange = @Exchange(Config.EXCHANGE), key = "events.UserDeletedEvent"
+    value = @Queue(Config.QUEUE + "_USER_DELETED_EVENT"), exchange = @Exchange(Config.EXCHANGE), key = "events.UserDeletedEvent"
   ))
   public void apply(UserDeletedEvent event) {
     users.remove(event.getAggregateId());
