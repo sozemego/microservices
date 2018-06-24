@@ -29,6 +29,8 @@ public class ProjectService {
 
   private static final Logger LOG = LoggerFactory.getLogger(ProjectService.class);
 
+  private final int projectsPerUser = 3;
+
   private final SourcedRepository<Project> repository;
   private final EventStoreService eventStoreService;
 
@@ -91,6 +93,7 @@ public class ProjectService {
 
   public void assignUserToProject(AssignUserToProjectCommand command) {
     validateUserExists(command.getUserId());
+    validateUserProjectsNumbers(command.getUserId());
     repository.save(command);
   }
 
@@ -100,7 +103,7 @@ public class ProjectService {
   }
 
   private void validateUserExists(AggregateId userId) {
-    if(!users.contains(userId)) {
+    if (!users.contains(userId)) {
       throw new IllegalStateException("User " + userId + " does not exist");
     }
   }
@@ -131,6 +134,20 @@ public class ProjectService {
   ))
   public void apply(UserDeletedEvent event) {
     users.remove(event.getAggregateId());
+  }
+
+  private void validateUserProjectsNumbers(AggregateId userId) {
+    long projects = repository
+                      .getAll()
+                      .values()
+                      .stream()
+                      .filter(project -> project.getUsers().contains(userId))
+                      .limit(3)
+                      .count();
+
+    if(projects == projectsPerUser) {
+      throw new IllegalStateException("User " + userId + " is already at maximum number of projects.");
+    }
   }
 
   private void validateProjectNameDoesNotExist(String name) {
