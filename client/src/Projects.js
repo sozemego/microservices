@@ -43,13 +43,20 @@ export class Projects extends Component {
     const project = this.state.projects.find(p => p.id === projectId);
 
     return this.state.users.filter(user => {
-      return !project.userIds.find(userId => userId === user.id);
-    }).map(user => {
-      return (
-        <MenuItem key={user.id} value={user.id}>{user.name}</MenuItem>
-      )
-    });
+        return !project.userIds.find(userId => userId === user.id);
+      })
+      .filter(this.validateNumberOfProjects)
+      .map(user => {
+        return (
+          <MenuItem key={user.id} value={user.id}>{user.name}</MenuItem>
+        )
+      });
   };
+
+  validateNumberOfProjects = (user) => {
+    return this.state.projects
+      .filter(project => project.userIds.find(userId => userId === user.id)).length < 3;
+  }
 
   getProjectComponent = (project) => {
     console.log(project);
