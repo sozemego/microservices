@@ -67,4 +67,25 @@ Events which simply assign fields also do not need to be implemented. [Source](h
 
 Commands are not special here, they are processed by aggregates, thanks to reflection.
 
+Dealing with eventual consistency - there are many approaches for this problem. I don't think I've solved this
+problem here, I just circumvented it (in some places) by using less asynchronous actions. User interactions go as follows:
 
+1. API call to a service
+2. Create command 
+3. Service validation
+4. Process the command by in-memory aggregate, which emits event(s)
+5. Send generated events to the store (synchronous HTTP)
+6. Emit the event asynchronously
+7. If all went well in 4, update in-memory aggregate
+
+Example: 
+We want to add users to projects. Users and projects are separate services. When adding a new user,
+UserCreatedEvent is emitted, which projects service listens to. This way, we don't need to query the user service
+for available users, we can just store the user aggregateIds. So it becomes:
+1. Send API call to assign userId to projectId
+2. Create AssignUserToProjectCommand
+3. Validate project exists and user exists
+4. Repository gets the command, aggregate processes it. Here the project is checking if this user is already added or not
+5. Send event(s) to the store
+6. The store emits the event
+7. Update in-memory aggregate
