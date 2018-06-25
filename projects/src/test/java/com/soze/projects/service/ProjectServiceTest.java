@@ -1,5 +1,6 @@
 package com.soze.projects.service;
 
+import com.soze.common.aggregate.Aggregate;
 import com.soze.common.aggregate.AggregateId;
 import com.soze.common.events.UserCreatedEvent;
 import com.soze.common.events.UserNameChangedEvent;
@@ -192,6 +193,76 @@ public class ProjectServiceTest {
     fail("Did not throw");
   }
 
+  @Test
+  public void testAssignUserToProject() {
+    AggregateId projectId = AggregateId.create();
+    AggregateId userId = AggregateId.create();
+    projectService.createProject(new CreateProjectCommand(projectId, "name"));
+    projectService.apply(new UserCreatedEvent(userId, OffsetDateTime.now(), 1, "user name"));
 
+    projectService.assignUserToProject(new AssignUserToProjectCommand(projectId, userId));
+    Project project = projectService.getProject(projectId);
+    assertTrue(project.getUsers().contains(userId));
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testAssignUserToProjectProjectDoesNotExist() {
+    AggregateId projectId = AggregateId.create();
+    AggregateId userId = AggregateId.create();
+    projectService.apply(new UserCreatedEvent(userId, OffsetDateTime.now(), 1, "user name"));
+    projectService.assignUserToProject(new AssignUserToProjectCommand(projectId, userId));
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testAssignUserToProjectUserDoesNotExist() {
+    AggregateId projectId = AggregateId.create();
+    projectService.createProject(new CreateProjectCommand(projectId, "name"));
+
+    projectService.assignUserToProject(new AssignUserToProjectCommand(projectId, AggregateId.create()));
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testAssignUserToDeletedProject() {
+    AggregateId projectId = AggregateId.create();
+    AggregateId userId = AggregateId.create();
+    projectService.createProject(new CreateProjectCommand(projectId, "name"));
+    projectService.apply(new UserCreatedEvent(userId, OffsetDateTime.now(), 1, "user name"));
+    projectService.deleteProject(new DeleteProjectCommand(projectId));
+
+    projectService.assignUserToProject(new AssignUserToProjectCommand(projectId, userId));
+  }
+
+  @Test
+  public void testRemoveUserFromProject() {
+    AggregateId projectId = AggregateId.create();
+    AggregateId userId = AggregateId.create();
+    projectService.createProject(new CreateProjectCommand(projectId, "name"));
+    projectService.apply(new UserCreatedEvent(userId, OffsetDateTime.now(), 1, "user name"));
+
+    projectService.assignUserToProject(new AssignUserToProjectCommand(projectId, userId));
+    Project project = projectService.getProject(projectId);
+    assertTrue(project.getUsers().contains(userId));
+
+    projectService.removeUserFromProject(new RemoveUserFromProjectCommand(projectId, userId));
+
+    project = projectService.getProject(projectId);
+    assertFalse(project.getUsers().contains(userId));
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testRemoveUserFromProjectProjectDoesNotExist() {
+    AggregateId projectId = AggregateId.create();
+    AggregateId userId = AggregateId.create();
+    projectService.apply(new UserCreatedEvent(userId, OffsetDateTime.now(), 1, "user name"));
+    projectService.removeUserFromProject(new RemoveUserFromProjectCommand(projectId, userId));
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testRemoveUserFromProjectUserDoesNotExist() {
+    AggregateId projectId = AggregateId.create();
+    AggregateId userId = AggregateId.create();
+    projectService.createProject(new CreateProjectCommand(projectId, "name"));
+    projectService.removeUserFromProject(new RemoveUserFromProjectCommand(projectId, userId));
+  }
 
 }

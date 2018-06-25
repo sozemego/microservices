@@ -92,12 +92,14 @@ public class ProjectService {
   }
 
   public void assignUserToProject(AssignUserToProjectCommand command) {
+    validateProjectExists(command.getAggregateId());
     validateUserExists(command.getUserId());
     validateUserProjectsNumbers(command.getUserId());
     repository.save(command);
   }
 
   public void removeUserFromProject(RemoveUserFromProjectCommand command) {
+    validateProjectExists(command.getAggregateId());
     validateUserExists(command.getUserId());
     repository.save(command);
   }
@@ -110,6 +112,9 @@ public class ProjectService {
 
   public Project getProject(AggregateId aggregateId) {
     Project project = repository.get(aggregateId);
+    if(project == null) {
+      return null;
+    }
     return project.isDeleted() ? null : project;
   }
 
@@ -178,6 +183,12 @@ public class ProjectService {
     List<BaseEvent> events = eventStoreService.getEvents(eventTypes);
     LOG.info("REPLAYING [{}] user events", events.size());
     ReflectionUtils.applyEvents(this, events);
+  }
+
+  private void validateProjectExists(AggregateId aggregateId) {
+    if(getProject(aggregateId) == null) {
+      throw new IllegalStateException("Project id " + aggregateId + " does not exist.");
+    }
   }
 
 }
