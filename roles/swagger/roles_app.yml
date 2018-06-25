@@ -1,0 +1,27 @@
+swagger: "2.0"
+
+info:
+  title: "Roles API"
+  version:  "0.1"
+
+basePath: "/role"
+
+paths:
+  /all/:
+    get:
+      responses:
+        '200':
+          description: "Returns all available roles"
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Role'
+
+definitions:
+  Role:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
