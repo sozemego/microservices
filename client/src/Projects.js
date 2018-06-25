@@ -59,7 +59,6 @@ export class Projects extends Component {
   }
 
   getProjectComponent = (project) => {
-    console.log(project);
     return (
       <div style={{display: "flex", flexDirection: "row", justifyContent: "start", alignItems: "center"}}>
         <TextField defaultValue={project.name}
