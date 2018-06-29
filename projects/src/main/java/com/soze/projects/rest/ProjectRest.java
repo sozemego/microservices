@@ -1,6 +1,7 @@
 package com.soze.projects.rest;
 
 import com.soze.common.aggregate.AggregateId;
+import com.soze.common.utils.CollectionUtils;
 import com.soze.projects.aggregate.Project;
 import com.soze.projects.command.*;
 import com.soze.projects.dto.ProjectDto;
@@ -82,10 +83,7 @@ public class ProjectRest {
   }
 
   private List<ProjectDto> convertToDtos(List<Project> projects) {
-    return projects
-             .stream()
-             .map(this::convertToDto)
-             .collect(Collectors.toList());
+    return CollectionUtils.map(projects, this::convertToDto);
   }
 
   private ProjectDto convertToDto(Project project) {

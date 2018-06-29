@@ -1,7 +1,10 @@
 package com.soze.common.utils;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class CollectionUtils {
 
@@ -19,6 +22,16 @@ public class CollectionUtils {
       set.add(element);
     }
     return set;
+  }
+
+  /**
+   * A simple utility function used for common cases where you create a stream, map and then collect.
+   */
+  public static <S, T> List<T> map(List<S> source, Function<S, T> mapper) {
+    return source
+             .stream()
+             .map(mapper)
+             .collect(Collectors.toList());
   }
 
 }
