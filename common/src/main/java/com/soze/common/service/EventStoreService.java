@@ -5,6 +5,9 @@ import com.soze.common.events.BaseEvent;
 
 import java.util.List;
 
+/**
+ * Used to communicate with the EventStore.
+ */
 public interface EventStoreService {
   List<BaseEvent> getAggregateEvents(AggregateId aggregateId);
 
