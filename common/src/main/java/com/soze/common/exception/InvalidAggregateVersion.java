@@ -2,6 +2,10 @@ package com.soze.common.exception;
 
 import com.soze.common.aggregate.AggregateId;
 
+/**
+ * Thrown when an aggregate expects a certain command version,
+ * but the command is for a different version.
+ */
 public class InvalidAggregateVersion extends RuntimeException {
 
   private final AggregateId aggregateId;

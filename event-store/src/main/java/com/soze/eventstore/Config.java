@@ -1,6 +1,6 @@
 package com.soze.eventstore;
 
-import com.soze.common.rest.IncomingRequestLogger;
+import com.soze.common.rest.HttpRequestLogger;
 import com.soze.common.service.EventPublisherService;
 import com.soze.common.service.EventPublisherServiceImpl;
 import org.springframework.amqp.core.*;
@@ -16,13 +16,13 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@Import({IncomingRequestLogger.class})
+@Import({HttpRequestLogger.class})
 public class Config implements WebMvcConfigurer {
 
   public static final String EXCHANGE = "EXCHANGE";
 
   @Autowired
-  private IncomingRequestLogger incomingRequestLogger;
+  private HttpRequestLogger httpRequestLogger;
 
   @Override
   public void addCorsMappings(final CorsRegistry registry) {
@@ -43,7 +43,7 @@ public class Config implements WebMvcConfigurer {
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(incomingRequestLogger);
+    registry.addInterceptor(httpRequestLogger);
   }
 
 }

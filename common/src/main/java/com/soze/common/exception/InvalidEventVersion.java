@@ -1,5 +1,9 @@
 package com.soze.common.exception;
 
+/**
+ * Thrown when an EventStore detected that the received event is of a wrong version.
+ * This can happen when many concurrent events for the same aggregate are sent.
+ */
 public class InvalidEventVersion extends RuntimeException {
 
   private final String aggregateId;

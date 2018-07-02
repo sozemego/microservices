@@ -9,6 +9,9 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Utils for applying commands and events.
+ */
 public class ReflectionUtils {
 
   private static final String APPLY = "apply";
@@ -16,6 +19,16 @@ public class ReflectionUtils {
 
   private static Method NO_OPERATION_METHOD = getNoop();
 
+  /**
+   * Applies event to the target {@link Object}.
+   * If the given target has a method which handles this type of event, it is called.
+   *
+   * Additionally, events which only assign fields don't need to have their own dedicated methods,
+   * because this method will detect those fields and assign the values from the event.
+   *
+   * Both of these ways will be used, so an event which assigns fields but also does something else (e.g. appends a list),
+   * need not implement the assignment logic.
+   */
   public static void applyEvent(Object target, Object event) {
     Method method = getMethod(APPLY, target, event.getClass());
     invoke(method, target, event);
@@ -26,10 +39,17 @@ public class ReflectionUtils {
     apply(fieldMethodMap, event, target);
   }
 
+  /**
+   * @see ReflectionUtils#applyEvent(Object, Object)
+   */
   public static void applyEvents(Object target, List<BaseEvent> events) {
     events.forEach(event -> applyEvent(target, event));
   }
 
+  /**
+   * Attempts to find a method which accepts the given event and calls it.
+   * Returns a List of {@link BaseEvent}s that are produced by the aggregate.
+   */
   public static List<BaseEvent> processCommand(Aggregate target, Object event) {
     Method method = getMethod(PROCESS, target, event.getClass());
     try {
@@ -49,6 +69,10 @@ public class ReflectionUtils {
     }
   }
 
+  /**
+   * Attempts to find a method which takes given clazz as argument.
+   * If no such method is found, a noop method is returned.
+   */
   private static Method getMethod(String name, Object target, Class clazz) {
     Objects.requireNonNull(name);
     Objects.requireNonNull(target);
@@ -102,6 +126,11 @@ public class ReflectionUtils {
     return fields;
   }
 
+  /**
+   * Creates a Field/Method map.
+   * For each field (e.g. "names") finds an appropriate getter (e.g. "getNames").
+   * The names should follow bean convention of naming.
+   */
   private static Map<Field, Method> matchFieldsAndGetters(List<Field> fields, List<Method> getters) {
     Map<Field, Method> map = new HashMap<>();
     for (Field field : fields) {
@@ -111,6 +140,9 @@ public class ReflectionUtils {
     return map;
   }
 
+  /**
+   * @see ReflectionUtils#matchFieldsAndGetters(List, List)
+   */
   private static Optional<Method> matchFieldToMethod(Field field, List<Method> getters) {
     for (Method getter : getters) {
       if (field.getName().equals(getFieldNameFromGetter(getter))) {
@@ -120,6 +152,10 @@ public class ReflectionUtils {
     return Optional.empty();
   }
 
+  /**
+   * Returns field name for a given getter.
+   * Currently accepted getters start with either "is" or "get".
+   */
   private static String getFieldNameFromGetter(Method getter) {
     String name = getter.getName();
     if (name.startsWith("is")) {
@@ -137,6 +173,10 @@ public class ReflectionUtils {
     return String.valueOf(firstChar).toLowerCase() + pascalCase.substring(1);
   }
 
+  /**
+   * For each Entry<Field, Method> in the map, sets the given field value
+   * (on the aggregate) to what the method returns (called on the event, as it's supposed to be a getter).
+   */
   private static void apply(Map<Field, Method> map, Object event, Object aggregate) {
     try {
       for (Map.Entry<Field, Method> entry : map.entrySet()) {

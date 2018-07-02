@@ -15,9 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 
 @Component
 @Configuration
-public class IncomingRequestLogger extends HandlerInterceptorAdapter {
+public class HttpRequestLogger extends HandlerInterceptorAdapter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(IncomingRequestLogger.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HttpRequestLogger.class);
   private static final Marker API_IN = MarkerFactory.getMarker("API_IN");
   private static final Marker API_OUT = MarkerFactory.getMarker("API_OUT");
 
@@ -50,7 +50,7 @@ public class IncomingRequestLogger extends HandlerInterceptorAdapter {
   }
 
   @Bean
-  IncomingRequestLogger incomingRequestLogger() {
-    return new IncomingRequestLogger();
+  HttpRequestLogger incomingRequestLogger() {
+    return new HttpRequestLogger();
   }
 }

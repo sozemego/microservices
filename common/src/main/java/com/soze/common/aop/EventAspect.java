@@ -1,5 +1,7 @@
 package com.soze.common.aop;
 
+import com.soze.common.command.Command;
+import com.soze.common.events.BaseEvent;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -9,6 +11,9 @@ import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Simple aspect for logging method calls which accept {@link BaseEvent}s.
+ */
 @Aspect
 @Configuration
 public class EventAspect {
