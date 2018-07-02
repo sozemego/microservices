@@ -146,6 +146,7 @@ public class ProjectService {
                       .getAll()
                       .values()
                       .stream()
+                      .filter(project -> !project.isDeleted())
                       .filter(project -> project.getUsers().contains(userId))
                       .limit(3)
                       .count();
