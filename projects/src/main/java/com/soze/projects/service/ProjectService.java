@@ -36,7 +36,12 @@ public class ProjectService {
 
   private final Set<AggregateId> users = Collections.synchronizedSet(new HashSet<>());
 
-  private final Set<String> addedProjects = Collections.synchronizedSet(new HashSet<>());
+  /**
+   * The purpose of this set is to store all project names are currently added,
+   * so that two people simultaneously requesting a project with the same name to be created,
+   * will not be able to do it.
+   */
+  private final Set<String> projectsNamesBeingAdded = Collections.synchronizedSet(new HashSet<>());
 
   @Autowired
   public ProjectService(SourcedRepository<Project> repository,
@@ -67,7 +72,7 @@ public class ProjectService {
 
     Project project = repository.save(command);
 
-    addedProjects.remove(command.getName());
+    projectsNamesBeingAdded.remove(command.getName());
 
     return project;
   }
@@ -170,7 +175,7 @@ public class ProjectService {
   }
 
   private void validateProjectNameIsNotBeingAdded(String name) {
-    if (!addedProjects.add(name)) {
+    if (!projectsNamesBeingAdded.add(name)) {
       throw new IllegalStateException("Project name: " + name + " already exists");
     }
   }
