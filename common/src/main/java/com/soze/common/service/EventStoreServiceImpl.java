@@ -28,6 +28,9 @@ import java.util.concurrent.Callable;
 
 public class EventStoreServiceImpl implements EventStoreService {
 
+  /**
+   * Those strings should not be hardcoded, but they are at the moment for simplicity
+   */
   private static final String GET_AGGREGATE_EVENTS = "http://localhost:8000/events/aggregate/";
   private static final String GET_ALL_EVENTS = "http://localhost:8000/events/all";
   private static final String GET_EVENTS_BY_TYPE = "http://localhost:8000/events/type";
@@ -85,7 +88,7 @@ public class EventStoreServiceImpl implements EventStoreService {
     Callable<ResponseEntity> callable = () -> restTemplate.postForEntity(POST_EVENTS, events, String.class);
 
     RetryConfig config = new RetryConfigBuilder()
-                           .withFixedBackoff()
+                           .withExponentialBackoff()
                            .withDelayBetweenTries(2, ChronoUnit.SECONDS)
                            .withMaxNumberOfTries(5)
                            .retryOnSpecificExceptions(ResourceAccessException.class)

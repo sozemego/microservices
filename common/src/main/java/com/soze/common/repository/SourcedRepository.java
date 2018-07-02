@@ -10,6 +10,11 @@ import com.soze.common.exception.InvalidEventVersion;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Repository for aggregates. Follows the Event Sourcing pattern.
+ * Commands can be applied which will cause a change in the Aggregate and store events in the Event Store.
+ * @param <E>
+ */
 public interface SourcedRepository<E extends Aggregate> {
 
   E get(AggregateId aggregateId);
@@ -23,6 +28,10 @@ public interface SourcedRepository<E extends Aggregate> {
 
   boolean checkExists(AggregateId aggregateId);
 
+  /**
+   * Replays given events. This method assumes you want to start from a clean slate,
+   * so all aggregates are removed.
+   */
   void replay(List<BaseEvent> events);
 
 }

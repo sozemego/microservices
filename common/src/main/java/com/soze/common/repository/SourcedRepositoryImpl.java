@@ -18,6 +18,12 @@ public class SourcedRepositoryImpl<E extends Aggregate> implements SourcedReposi
 
   private final Class<E> clazz;
   private final EventStoreService eventStoreService;
+  /**
+   * The aggregates are stored in a map and they serve as a read model for clients.
+   * If a command is successfully processed by the aggregate and the Event Store
+   * accepts the event (errors can happen due to simultaneous and conflicting events),
+   * the aggregate is updated.
+   */
   private final Map<AggregateId, E> aggregates = new ConcurrentHashMap<>();
 
   @Autowired
