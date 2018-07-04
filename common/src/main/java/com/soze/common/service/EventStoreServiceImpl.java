@@ -11,6 +11,9 @@ import com.soze.common.aggregate.AggregateId;
 import com.soze.common.events.BaseEvent;
 import com.soze.common.events.BaseEvent.EventType;
 import com.soze.common.exception.InvalidEventVersion;
+import com.soze.common.exception.TimeoutExceeded;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
@@ -27,6 +30,8 @@ import java.util.*;
 import java.util.concurrent.Callable;
 
 public class EventStoreServiceImpl implements EventStoreService {
+
+  private static final Logger LOG = LoggerFactory.getLogger(EventStoreServiceImpl.class);
 
   /**
    * Those strings should not be hardcoded, but they are at the moment for simplicity
@@ -99,7 +104,8 @@ public class EventStoreServiceImpl implements EventStoreService {
         .afterFailedTry(l -> System.out.println("Failed calling " + POST_EVENTS + ". Tries: " + l.getTotalTries()))
         .execute(callable);
     } catch (RetriesExhaustedException e) {
-      throw new IllegalStateException("Timeout for url " + POST_EVENTS);
+      LOG.info("Timeout for url " + POST_EVENTS);
+      throw new TimeoutExceeded(e);
     } catch (UnexpectedException e) {
 
       if (e.getCause() instanceof HttpClientErrorException) {
