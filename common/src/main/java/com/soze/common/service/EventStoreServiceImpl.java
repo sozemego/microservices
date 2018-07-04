@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.soze.common.aggregate.AggregateId;
 import com.soze.common.events.BaseEvent;
 import com.soze.common.events.BaseEvent.EventType;
+import com.soze.common.exception.AggregateDoesNotExist;
+import com.soze.common.exception.InvalidAggregateVersion;
 import com.soze.common.exception.InvalidEventVersion;
 import com.soze.common.exception.TimeoutExceeded;
 import org.slf4j.Logger;
@@ -50,41 +52,44 @@ public class EventStoreServiceImpl implements EventStoreService {
 
   @Override
   public List<BaseEvent> getAggregateEvents(AggregateId aggregateId) {
-    final ResponseEntity<String> response = get(GET_AGGREGATE_EVENTS + aggregateId.toString(), String.class);
+    ResponseEntity<String> response = get(GET_AGGREGATE_EVENTS + aggregateId.toString(), String.class);
 
     return parseJson(response.getBody());
   }
 
   @Override
   public List<BaseEvent> getAllEvents() {
-    final ResponseEntity<String> response = get(GET_ALL_EVENTS, String.class);
+    ResponseEntity<String> response = get(GET_ALL_EVENTS, String.class);
 
     return parseJson(response.getBody());
   }
 
   @Override
   public List<BaseEvent> getEvents(List<EventType> eventTypes) {
-    final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     eventTypes.forEach(type -> params.add("type", type.toString()));
 
-    final UriComponents uriComponents = UriComponentsBuilder
+    UriComponents uriComponents = UriComponentsBuilder
                                           .fromHttpUrl(GET_EVENTS_BY_TYPE)
                                           .queryParams(params)
                                           .build();
 
-    final String uri = uriComponents.toUriString();
+    String uri = uriComponents.toUriString();
 
-    final ResponseEntity<String> response = get(uri, String.class);
+    ResponseEntity<String> response = get(uri, String.class);
     return parseJson(response.getBody());
   }
 
   @Override
   public long getAggregateVersion(AggregateId aggregateId) {
     Objects.requireNonNull(aggregateId);
-    final ResponseEntity<String> response = get(GET_AGGREGATE_EVENTS + aggregateId.toString() + "?latest=true", String.class);
+    ResponseEntity<String> response = get(GET_AGGREGATE_EVENTS + aggregateId.toString() + "?latest=true", String.class);
 
     List<BaseEvent> events = parseJson(response.getBody());
-    return events.size();
+    if(events.isEmpty()) {
+      throw new AggregateDoesNotExist(aggregateId);
+    }
+    return events.get(0).getVersion();
   }
 
   @Override
@@ -120,7 +125,7 @@ public class EventStoreServiceImpl implements EventStoreService {
         }
       }
 
-      throw new RuntimeException(e.getCause());
+      throw new RuntimeException(e);
     }
   }
 
@@ -153,7 +158,8 @@ public class EventStoreServiceImpl implements EventStoreService {
                .execute(callable)
                .getResult();
     } catch (RetriesExhaustedException e) {
-      throw new IllegalStateException("Timeout for url " + url);
+      LOG.info("Timeout for url [{}]", url);
+      throw new TimeoutExceeded(e);
     } catch (UnexpectedException e) {
       throw new RuntimeException(e);
     }
