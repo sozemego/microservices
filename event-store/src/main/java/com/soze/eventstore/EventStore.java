@@ -36,7 +36,12 @@ public class EventStore {
 
   private final EventPublisherService eventPublisherService;
 
+  /**
+   * Queue of all events.
+   * It's possible that in the future this will be a queue per aggregate type.
+   */
   private final Queue<BaseEvent> events = new ConcurrentLinkedQueue<>();
+
   private final Map<AggregateId, Long> expectedVersions = new ConcurrentHashMap<>();
 
   private final Map<AggregateId, Object> locks = new ConcurrentHashMap<>();
@@ -58,15 +63,22 @@ public class EventStore {
     return new ArrayList<>(events);
   }
 
+  /**
+   * Returns all events for given aggregateId. If no aggregate is found, returns an empty list.
+   * If latest is true, returns only the last event.
+   */
   public List<BaseEvent> getAggregateEvents(AggregateId aggregateId, boolean latest) {
     final List<BaseEvent> events = getAggregateEvents(aggregateId);
     if (events.isEmpty()) {
       return events;
     }
 
-    return latest ? Arrays.asList(events.get(events.size() - 1)) : events;
+    return latest ? Collections.singletonList(events.get(events.size() - 1)) : events;
   }
 
+  /**
+   * Returns all events for a given aggregateId. If no aggregate is found, returns an empty list.
+   */
   private List<BaseEvent> getAggregateEvents(AggregateId aggregateId) {
     return events
              .stream()
@@ -74,6 +86,9 @@ public class EventStore {
              .collect(Collectors.toList());
   }
 
+  /**
+   * Get events by type.
+   */
   public List<BaseEvent> getAggregateEvents(Set<EventType> eventTypes) {
     return events
              .stream()
@@ -81,12 +96,25 @@ public class EventStore {
              .collect(Collectors.toList());
   }
 
+  /**
+   * Handles the given event. This method is thread safe for each aggregate.
+   * Events for two different aggregates will not block each other.
+   *
+   * If the event version is unexpected and one event conflicts with other events,
+   * {@link InvalidEventVersion} is thrown. Otherwise, if the versions are unexpected,
+   * but they don't conflict, nothing bad happens.
+   *
+   * At the end, if all goes well, the event is published to the Exchange.
+   *
+   */
   public void handleEvent(BaseEvent event) {
     synchronized (getLock(event.getAggregateId())) {
       LOG.info("Handling [{}]", event);
-      validateEventVersion(event);
+      boolean valid = validateEventVersion(event);
       events.add(event);
-      expectedVersions.compute(event.getAggregateId(), (k, v) -> v + 1L);
+      if(valid) {
+        expectedVersions.compute(event.getAggregateId(), (k, v) -> v + 1L);
+      }
       LOG.info("Handled event [{}]", event);
     }
     eventPublisherService.sendEvent(Config.EXCHANGE, "events." + event.getClass().getSimpleName(), event);
@@ -96,7 +124,13 @@ public class EventStore {
     events.forEach(this::handleEvent);
   }
 
-  private void validateEventVersion(BaseEvent event) {
+  /**
+   * Checks if the given event has the expected version.
+   * If the expected version is correct, returns true.
+   * If the expected version is not correct, but the events don't collide, returns false.
+   * If the expected version is not correct and the events collide, throws {@link InvalidEventVersion}.
+   */
+  private boolean validateEventVersion(BaseEvent event) {
     long expectedVersion = expectedVersions.computeIfAbsent(event.getAggregateId(), (v) -> 1L);
     if (expectedVersion != event.getVersion()) {
       LOG.info("Invalid event version: [{}]. Expected [{}]", event, expectedVersion);
@@ -104,7 +138,9 @@ public class EventStore {
       if (event.conflicts(aheadEventTypes)) {
         throw new InvalidEventVersion(event, expectedVersion);
       }
+      return false;
     }
+    return true;
   }
 
   private Set<EventType> getEventTypesAfterVersion(AggregateId aggregateId, long version) {
