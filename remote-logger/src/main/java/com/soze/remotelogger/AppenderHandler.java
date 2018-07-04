@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * For each application id, adds new file appender.
@@ -29,6 +30,8 @@ public class AppenderHandler {
   private static final String APPENDER_SUFFIX = "-FILE-APPENDER";
 
   public void handleAppender(String applicationId, Marker marker) {
+    Objects.requireNonNull(applicationId);
+    Objects.requireNonNull(marker);
 
     LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
     String appenderName = applicationId + "-" + marker.getName() + APPENDER_SUFFIX;
@@ -70,6 +73,10 @@ public class AppenderHandler {
     logger.addAppender(fileAppender);
   }
 
+  /**
+   * Very similar to {@link OnMarkerEvaluator}, except it only allows the event
+   * to be logged when it contains all of given markers.
+   */
   private static class MultipleMarkerEvaluator extends EventEvaluatorBase<ILoggingEvent> {
 
     private final List<String> markerList = new ArrayList<String>();
@@ -80,7 +87,7 @@ public class AppenderHandler {
 
 
     /**
-     * Return true if event passed as parameter all of the specified markers.
+     * Return true if event passed as parameter has all of the specified markers.
      */
     public boolean evaluate(ILoggingEvent event) throws NullPointerException, EvaluationException {
 
