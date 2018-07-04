@@ -12,10 +12,22 @@ import java.util.List;
  * Used to communicate with the EventStore.
  */
 public interface EventStoreService {
+
+  /**
+   * Returns an empty list of the given aggregate does not exist.
+   * @throws TimeoutExceeded if event store could not be reached
+   */
   List<BaseEvent> getAggregateEvents(AggregateId aggregateId);
 
+  /**
+   * @throws TimeoutExceeded if event store could not be reached
+   */
   List<BaseEvent> getAllEvents();
 
+  /**
+   * Retrieves all events with given types.
+   * @throws TimeoutExceeded if event store could not be reached
+   */
   List<BaseEvent> getEvents(List<BaseEvent.EventType> eventTypes);
 
   /**

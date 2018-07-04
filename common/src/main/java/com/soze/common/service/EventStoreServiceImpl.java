@@ -53,14 +53,12 @@ public class EventStoreServiceImpl implements EventStoreService {
   @Override
   public List<BaseEvent> getAggregateEvents(AggregateId aggregateId) {
     ResponseEntity<String> response = get(GET_AGGREGATE_EVENTS + aggregateId.toString(), String.class);
-
     return parseJson(response.getBody());
   }
 
   @Override
   public List<BaseEvent> getAllEvents() {
     ResponseEntity<String> response = get(GET_ALL_EVENTS, String.class);
-
     return parseJson(response.getBody());
   }
 
@@ -75,7 +73,6 @@ public class EventStoreServiceImpl implements EventStoreService {
                                           .build();
 
     String uri = uriComponents.toUriString();
-
     ResponseEntity<String> response = get(uri, String.class);
     return parseJson(response.getBody());
   }
