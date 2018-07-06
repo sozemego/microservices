@@ -29,11 +29,18 @@ public class ProjectService {
 
   private static final Logger LOG = LoggerFactory.getLogger(ProjectService.class);
 
+  /**
+   * TODO this should be loaded from configuration
+   */
   private final int projectsPerUser = 3;
 
   private final SourcedRepository<Project> repository;
   private final EventStoreService eventStoreService;
 
+  /**
+   * This service listens to {@link UserCreatedEvent} and {@link UserDeletedEvent},
+   * to keep a Set of user ids that are available.
+   */
   private final Set<AggregateId> users = Collections.synchronizedSet(new HashSet<>());
 
   /**
@@ -147,11 +154,8 @@ public class ProjectService {
   }
 
   private void validateUserProjectsNumbers(AggregateId userId) {
-    long projects = repository
-                      .getAll()
-                      .values()
+    long projects = getAllProjects()
                       .stream()
-                      .filter(project -> !project.isDeleted())
                       .filter(project -> project.getUsers().contains(userId))
                       .limit(3)
                       .count();
@@ -162,12 +166,9 @@ public class ProjectService {
   }
 
   private void validateProjectNameDoesNotExist(String name) {
-    repository
-      .getAll()
-      .values()
+    getAllProjects()
       .stream()
       .filter(project -> name.equals(project.getName()))
-      .filter(project -> !project.isDeleted())
       .findFirst()
       .ifPresent((project) -> {
         throw new IllegalStateException("Project name: " + name + " already exists");
